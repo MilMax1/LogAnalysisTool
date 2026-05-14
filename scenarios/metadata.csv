@@ -1,0 +1,11 @@
+scenario_id,block_id,label,raw_file,numbered_file,line_count
+scenario_01,blk_-1608999687919862906,Normal,scenario_01_raw.txt,scenario_01_numbered.txt,269
+scenario_02,blk_7503483334202473044,Normal,scenario_02_raw.txt,scenario_02_numbered.txt,22
+scenario_03,blk_-9073992586687739851,Normal,scenario_03_raw.txt,scenario_03_numbered.txt,22
+scenario_04,blk_7854771516489510256,Normal,scenario_04_raw.txt,scenario_04_numbered.txt,38
+scenario_05,blk_1717858812220360316,Normal,scenario_05_raw.txt,scenario_05_numbered.txt,38
+scenario_06,blk_-3544583377289625738,Anomaly,scenario_06_raw.txt,scenario_06_numbered.txt,223
+scenario_07,blk_-8531310335568756456,Anomaly,scenario_07_raw.txt,scenario_07_numbered.txt,40
+scenario_08,blk_3947106522258141922,Anomaly,scenario_08_raw.txt,scenario_08_numbered.txt,40
+scenario_09,blk_7956543127401791181,Anomaly,scenario_09_raw.txt,scenario_09_numbered.txt,39
+scenario_10,blk_-3102267849859399193,Anomaly,scenario_10_raw.txt,scenario_10_numbered.txt,8
