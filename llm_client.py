@@ -12,6 +12,7 @@ def ask_llm(prompt: str) -> str:
     response = client.responses.create(
         model=model,
         input=prompt
+        #temperature här?
     )
 
     return response.output_text

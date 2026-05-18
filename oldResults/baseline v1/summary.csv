@@ -1,0 +1,3 @@
+scenario_id,ground_truth,predicted,correct,line_count,events_count,result_file
+scenario_01,Normal,Normal,True,269,4,results\baseline\scenario_01.json
+scenario_02,Normal,Normal,True,22,4,results\baseline\scenario_02.json

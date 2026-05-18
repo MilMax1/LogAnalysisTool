@@ -1,0 +1,84 @@
+{
+  "scenario_id": "scenario_01",
+  "classification": "Normal",
+  "confidence": "high",
+  "summary": "Loggarna visar normal blockhantering i HDFS: blocket skapas, replikeras till många datanoder och raderas korrekt efter att ha markerats som ogiltig. Alla loggrader är INFO och ingen tyder på någon form av fel eller avvikelse.",
+  "events": [
+    {
+      "event_type": "Block allocation and initial write",
+      "supporting_log_lines": [
+        1,
+        2
+      ],
+      "observation": "Blocket blk_-1608999687919862906 tas emot av en datanod och allokeras av namn-systemet.",
+      "interpretation": "Detta indikerar början på en normal blockskrivprocess.",
+      "recommended_next_step": "Ingen åtgärd krävs om detta är väntat blockskrivning."
+    },
+    {
+      "event_type": "Block replication and propagation",
+      "supporting_log_lines": [
+        11,
+        12,
+        13,
+        21,
+        22,
+        31,
+        32,
+        65,
+        66,
+        163
+      ],
+      "observation": "Blocket lagras på flera datanoder och blockkartan uppdateras upprepat.",
+      "interpretation": "Blocket replikeras enligt design för redundans i ett distribuerat filsystem.",
+      "recommended_next_step": "Ingen åtgärd så länge replikeringsgraden är korrekt och inga errors rapporteras."
+    },
+    {
+      "event_type": "Block serving to clients",
+      "supporting_log_lines": [
+        23,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "observation": "Datanoder serverar blocket till klienter från många olika klientadresser.",
+      "interpretation": "Blocket är tillgängligt och används av klienter, normal förväntad aktivitet.",
+      "recommended_next_step": "Övervaka för onormalt många eller felaktiga läsningar, men inget misstänkt här."
+    },
+    {
+      "event_type": "Block deletion process",
+      "supporting_log_lines": [
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        261,
+        262,
+        263,
+        264,
+        265,
+        266,
+        267,
+        268,
+        269
+      ],
+      "observation": "Blocket markeras som ogiltigt på olika datanoder och filer tas fysiskt bort efteråt.",
+      "interpretation": "När filen eller blocket inte längre behövs tas det korrekt bort från alla replikerade noder.",
+      "recommended_next_step": "Bekräfta att blocket bör tas bort (t.ex. enligt filsystemets policy eller användaråtgärd), men loggarna tyder på korrekt radering."
+    }
+  ],
+  "unsupported_claims": []
+}

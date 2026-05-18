@@ -1,0 +1,46 @@
+```json
+{
+  "scenario_id": "scenario_03",
+  "classification": "Normal",
+  "confidence": "high",
+  "summary": "Loggscenariot visar ett normalt förlopp vid skapande, replikering, verifikation och borttagning av ett HDFS-block. Inga felmeddelanden eller varningar observeras.",
+  "events": [
+    {
+      "event_type": "Block creation and replication",
+      "supporting_log_lines": [1, 2, 3, 4],
+      "observation": "Blocket blk_-9073992586687739851 initieras och tas emot av flera DataNodes.",
+      "interpretation": "Det är normalt att ett nytt block distribueras till flera noder enligt replikeringspolicyn.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block reception acknowledged",
+      "supporting_log_lines": [5, 6, 7, 8, 9, 10],
+      "observation": "Flera PacketResponder-processer kvitterar mottagandet av blocket med rätt storlek.",
+      "interpretation": "Korrekt och normal kvittering vid blocköverföringen.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block map updates",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blocket läggs till i blockkartan för respektive DataNode.",
+      "interpretation": "Visar att replikeringen slutförts enligt HDFS-standardflöde.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Periodic block verification",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Verifiering av blocket lyckas vid flera tillfällen.",
+      "interpretation": "Inga indikatorer på datakorruption eller fel.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block deletion sequence",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket läggs till för borttagning på alla noder och tas sedan bort från filsystemet.",
+      "interpretation": "Raderingen sker systematiskt och utan felmeddelanden.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

@@ -1,0 +1,39 @@
+```json
+{
+  "scenario_id": "scenario_09",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "summary": "Ett HDFS-block skrivs och replikeras normalt men möter sedan återkommande undantag (exceptions) vid åtkomst, och slutligen uppstår ett oväntat fel vid blockradering.",
+  "events": [
+    {
+      "event_type": "Normal block writing and replication",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      "observation": "Blocket blk_7956543127401791181 tas emot, replikeras till flera noder och verifieras utan fel.",
+      "interpretation": "Blocket skrivs och replikeringsprocessen slutförs som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs i detta steg."
+    },
+    {
+      "event_type": "Repeated exceptions when serving block",
+      "supporting_log_lines": [17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+      "observation": "Upprepade WARN-loggar om undantag när olika DataNodes försöker leverera blocket till olika klienter/adresser.",
+      "interpretation": "Flera DataNode-serveringsförsök misslyckas för detta block, vilket indikerar ett system- eller nätverksproblem snarare än enstaka fel.",
+      "recommended_next_step": "Undersök orsak till exceptions, inklusive nätverksproblem, blockkorruption eller resursbrist på berörda noder."
+    },
+    {
+      "event_type": "Addition to invalidSet and deletion attempts",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 39],
+      "observation": "Blocket läggs till i invalidSet på alla replikerade noder och försök görs att ta bort filen.",
+      "interpretation": "HDFS identifierar blocket som korrupt eller otillgängligt och börjar sanera systemet från det.",
+      "recommended_next_step": "Verifiera varför blocket markerats som ogiltigt genom att kontrollera HDFS health och block reports."
+    },
+    {
+      "event_type": "Unexpected error during block deletion",
+      "supporting_log_lines": [38],
+      "observation": "WARN-logg om oväntat fel vid radering av blocket: BlockInfo hittas ej i volumeMap.",
+      "interpretation": "Det finns inkonsistens i blockmetadata, vilket kan tyda på djupare fel i datahanteringen.",
+      "recommended_next_step": "Utför en fsck på filsystemet och analysera namenode/datanode-loggar efter liknande incidenter för att identifiera grundorsaken."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

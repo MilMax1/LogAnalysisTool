@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "summary": "Loggarna visar att blocket blk_3947106522258141922 först hanteras korrekt men senare uppstår många WARN-meddelanden om undantag vid försök att serva blocket. Blocket hamnar därefter i 'invalidSet' och tas till slut bort, men försök att lagra blocket görs ändå trots att det inte längre tillhör någon fil.",
+  "events": [
+    {
+      "event_type": "Successful block receipt and verification",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket mottas, repliceras och verifieras framgångsrikt på flera DataNodes.",
+      "interpretation": "Inledningsvis fungerade hela lagrings- och replikeringsprocessen som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta moment."
+    },
+    {
+      "event_type": "Exceptions when serving block",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "Många WARN-loggar visar exceptions när blocket ska servas till olika klienter, från olika DataNodes.",
+      "interpretation": "Det har uppstått fel vid läsning/leverans av blocket till klienter, vilket tyder på driftstörning eller korruption.",
+      "recommended_next_step": "Undersök detaljerad orsak till undantagen och om blocket är korrupt eller om andra nätverksfel föreligger."
+    },
+    {
+      "event_type": "Block marked as invalid and deleted",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        40
+      ],
+      "observation": "Blocket markeras som 'invalid' på alla involverade noder och tas sedan bort från filsystemet.",
+      "interpretation": "Systemet har själv identifierat och tagit bort blocket efter att något gått fel.",
+      "recommended_next_step": "Verifiera att inga filer saknas till följd av denna borttagning, samt kontrollera möjlig root-cause till blockinvaliditeten."
+    },
+    {
+      "event_type": "Attempt to add orphaned block",
+      "supporting_log_lines": [
+        38,
+        39
+      ],
+      "observation": "En förfrågan om att lagra blocket görs efter att det redan har markerats som ogiltigt och inte längre tillhör någon fil, men blocket läggs ändå till blockkartan.",
+      "interpretation": "Detta är oväntat och tyder på möjlig inkonsistens i systemets metadata.",
+      "recommended_next_step": "Undersök varför systemet försöker spara ett block som inte längre tillhör någon fil. Kör fsck och kontrollera för block- eller kataloginkonsistenser."
+    }
+  ],
+  "unsupported_claims": []
+}
