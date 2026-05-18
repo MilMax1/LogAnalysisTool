@@ -62,7 +62,7 @@ RULES: List[Rule] = [
             "field": "message",
             "contains": ["Failed to transfer"],
             "description": "Failed to transfer block"
-        }
+        },
         {
             "id":"E20",
             "type": "BlockInfo not found",
@@ -79,7 +79,7 @@ RULES: List[Rule] = [
             "contains": ["PendingReplicationMonitor", "timed out"],
             "description": "PendingReplicationMonitor timed out block"
         }
-]           
+]     
 
 def rule_matches(log: ParsedLog, rule: Rule) -> bool:
     field_name = rule.get("field", "message")
