@@ -7,15 +7,14 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(PROJECT_ROOT))
 
-from baseline import run_baseline  
+from workflow import run_workflow  # noqa: E402
 
 
 SCENARIOS_DIR = PROJECT_ROOT / "scenarios"
-RESULTS_DIR = PROJECT_ROOT / "results" / "baseline"
+RESULTS_DIR = PROJECT_ROOT / "results" / "workflow"
 METADATA_PATH = SCENARIOS_DIR / "metadata.csv"
 
-
-# ändra till None eller skriv om för att köra alla scenarier
+#ändra till None för att köra alla scenarier
 SCENARIOS_TO_RUN = {"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
 
 
@@ -84,9 +83,9 @@ def main() -> None:
 
             log_text = scenario_path.read_text(encoding="utf-8")
 
-            print(f"Kör baseline för {scenario_id} ({ground_truth})...")
+            print(f"Kör workflow för {scenario_id} ({ground_truth})...")
 
-            raw_output = run_baseline(log_text, scenario_id=scenario_id)
+            raw_output = run_workflow(log_text, scenario_id=scenario_id)
 
             raw_output_path = RESULTS_DIR / f"{scenario_id}_raw_output.txt"
             json_output_path = RESULTS_DIR / f"{scenario_id}.json"

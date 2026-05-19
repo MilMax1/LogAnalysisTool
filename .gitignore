@@ -41,6 +41,7 @@ logs/
 # Generated analysis results
 outputs/
 results/
+oldResults/
 reports/generated/
 tmp/
 temp/

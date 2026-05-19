@@ -1,9 +1,24 @@
 from llm_client import ask_llm
+from rule_engine import analyze_with_rules, build_structured_context
 
 
-def run_baseline(log_text: str, scenario_id: str) -> str:
+def run_workflow(log_text: str, scenario_id: str) -> str:
+    rule_result = analyze_with_rules(log_text)
+    structured_context = build_structured_context(rule_result)
+
     prompt = f"""
 Du analyserar ett loggscenario från HDFS, ett distribuerat filsystem.
+
+Du får både rå loggdata och en strukturerad kontext som skapats av arbetsflödet.
+Använd den strukturerade kontexten som stöd, men basera slutsatser på loggraderna.
+
+Viktigt om strukturerad kontext:
+- Den strukturerade kontexten visar endast potentiellt relevanta loggrader och mönster.
+- Matchade regler eller kandidathändelser betyder inte automatiskt att scenariot är en anomali.
+- Använd kontexten som stöd för analysen, men avgör klassificeringen utifrån hela händelseförloppet.
+
+Strukturerad kontext:
+{structured_context}
 
 Uppgift:
 1. Bedöm om loggscenariot som helhet är "Normal" eller "Anomaly".
