@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket skapades, distribuerades och verifierades utan problem (inklusive flera lyckade verifieringar), uppstår ett stort antal exception-rader ('Got exception while serving block ...') från samtliga involverade datanoder när blocket ska levereras till olika klienter. Samtliga repliker markeras senare som ogiltiga ('added to invalidSet') och blocket tas bort. Sekvensen — från verifierade, lyckade block överföringar till omfattande exceptions och radering av samtliga repliker — tyder på anomal blockhantering, inte en normal livscykel.",
+  "summary": "Blocket fördelas och verifieras korrekt, men när det ska servas till klienter uppstår en rad exception-loggar från flera datanoder. Därefter markeras alla kopior som ogiltiga och blocket raderas från samtliga datanoder. Detta är avvikande jämfört med ett normalt HDFS-blockflöde där verifierade block som kan levereras ska kunna användas och inte massraderas efter undantag vid servering.",
+  "events": [
+    {
+      "event_type": "Block received and stored on multiple datanodes",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,4,6,8,10,11,12,13],
+      "observation": "Blocket mottas och lagras korrekt på minst tre olika datanoder.",
+      "interpretation": "Blockdistributionen fungerar enligt förväntan. Ett normalt steg i blockets livscykel.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta delsteg."
+    },
+    {
+      "event_type": "Block verification succeeded",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Blocket verifieras med lyckat resultat på flera datanoder efter lagring.",
+      "interpretation": "Blockets repliker är i detta läge intakta utan tecken på korruption.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del av scenariot."
+    },
+    {
+      "event_type": "Repeated exceptions while serving block",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,28,29,30,31,32],
+      "observation": "Samtliga datanoder får exception eller varningar när de försöker leverera blocket till olika klienter och IP-adresser.",
+      "interpretation": "Det är avvikande att alla repliker får exceptions när blocket ska konsumeras, särskilt efter lyckad verifiering. Detta indikerar ett underliggande problem med antingen blockintegritet, metadata, åtkomst eller kompatibilitet.",
+      "recommended_next_step": "Felsök undantagsorsaken (vad är det för exception?). Kontrollera blockmetadata, åtkomsträttigheter och systemloggar för djupare teknisk felinfo. Analys av DataNode- och NameNode-loggar bredare behövs."
+    },
+    {
+      "event_type": "Block invalidation and deletion on all datanodes",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37,38],
+      "observation": "Alla repliker markeras som ogiltiga och blocket raderas från samtliga datanoder strax efter exceptions.",
+      "interpretation": "Massradering av alla blockkopior efter exception-episoder tyder starkt på att blockets status blev permanent felaktig enligt HDFS. Detta sker endast vid allvarliga feltyp och är inte ett normalt flöde.",
+      "recommended_next_step": "Undersök NameNode och DataNode error-loggar för förståelse om invalid-triggern (t.ex. checksum mismatch, metadatafel, version mismatch). Eventuell replikering/återskap av data kan behövas."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

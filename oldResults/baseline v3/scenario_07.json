@@ -1,0 +1,104 @@
+{
+  "scenario_id": "scenario_07",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Loggarna visar ett initialt normalt blockflöde med framgångsrik replikering och verifiering. Därefter följer en serie av varningar om exception när blocket ska serveras till klienter (rader 17-31) från flera olika datanoder och mot olika klienter. Trots dessa exception-larm tycks blocket kunna serveras vid åtminstone ett tillfälle (rad 32). Kort efteråt markeras blocket som ogiltigt på samtliga repliker och raderas (rader 33-37), vilket tyder på att blocket förlorar sin koppling till filsystemet. En begäran om återlagring sker för ett block som inte längre tillhör någon fil (rad 38), vilket ytterligare stödjer ett inkonsekvent blockförlopp. Ingen faktisk 'ERROR'-logg finns, men mängden och mönstret av WARN tillsammans med deletions- samt invalid-händelser gör att helheten måste betraktas som avvikande.",
+  "summary": "Initial blockskrivning och -verifiering är normal. Kort därefter uppstår en serie exception vid försök att servera blocket från flera datanoder till olika klienter. Blocket markeras snart som ogiltigt och raderas från systemet, och det förekommer missriktade addStoredBlock-förfrågningar. Detta helhetsmönster indikerar ett problematiskt blockförlopp trots att ingen enskild error-logg förekommer.",
+  "events": [
+    {
+      "event_type": "block_reception_and_replication",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tas emot och replikeras till flera datanoder enligt förväntning.",
+      "interpretation": "Systemet fungerar normalt i detta initiala skede.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket verifieras med lyckad kontroll vid flera tillfällen.",
+      "interpretation": "Ingen korruption detekterad i blocket initialt.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "exceptions_serving_block",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "observation": "Flera exception uppstår vid försök att servera blocket från olika datanoder åt olika klienter.",
+      "interpretation": "Antingen är blocket blivit korrupt/inaccessible eller har filsystemet tappat kopplingen till blocket. Flera olika klient-IP:er påverkas, vilket tyder på systemomfattande problem för just detta block.",
+      "recommended_next_step": "Granska detaljerad logg för att förstå exception-orsak (stacktraces), kontrollera om blocket är skadat, samt undersök nyligen gjorda filsystemoperationer eller metadataförändringar."
+    },
+    {
+      "event_type": "block_served_successfully",
+      "severity": "normal",
+      "supporting_log_lines": [
+        32
+      ],
+      "observation": "Blocket serveras lyckat från en datanod till en klient.",
+      "interpretation": "Vissa operationer fungerar fortfarande trots exception mot andra klienter, vilket kan tyda på inkonsekvent tillstånd snarare än total blockkorruption.",
+      "recommended_next_step": "Studera varför det fungerar mot vissa klienter men misslyckas mot andra. Kontrollera klientversioner/nätverkstopologi."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        40
+      ],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) och raderas från samtliga inblandade datanoder.",
+      "interpretation": "Filen/blocket är inte längre giltigt i filsystemets metadata; möjligen på grund av korrupt filsystemtillstånd, odefinierad blockstatus eller felaktig hantering vid klientförfrågningar.",
+      "recommended_next_step": "Kontrollera varför blocket blev ogiltigt – granska trunkering/delete-operationer eller konsistensproblem i metadata."
+    },
+    {
+      "event_type": "orphan_block_addition",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        38,
+        39
+      ],
+      "observation": "addStoredBlock-förfrågan sker för block som inte längre är kopplat till någon fil.",
+      "interpretation": "Filsystemets block/fil-metadata står i inkonsistent tillstånd.",
+      "recommended_next_step": "Utför metadata-konsistenscheck med fsck eller liknande verktyg och identifiera möjliga race conditions eller buggar."
+    }
+  ],
+  "unsupported_claims": []
+}

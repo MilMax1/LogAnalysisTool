@@ -1,0 +1,93 @@
+{
+  "scenario_id": "scenario_05",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Trots en serie återkommande WARN-händelser om exception vid försök att servera samma block observeras inget ERROR eller ANOMALY. Blocket verifieras lyckat flera gånger och tas därefter bort enligt normala processer. Inga indikationer finns på dataförlust eller block-korruption.",
+  "summary": "Ett block skrivs till flera DataNodes, verifieras korrekt flera gånger och raderas slutligen enligt standardprocess. Ett antal READ-försök till blocket resulterar i undantag (WARN), men inga allvarliga felrapporter eller förlorade data observeras. Förloppet tyder på normal hantering, troligen relaterat till temporärt otillgängliga klienter eller nätverksproblem.",
+  "events": [
+    {
+      "event_type": "Block write and replication",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket blk_1717858812220360316 mottas, skrivs och replikeras till diverse DataNodes.",
+      "interpretation": "Skriva och replikera block till flera noder är normal funktion för HDFS.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Verifiering av blocket lyckas upprepade gånger.",
+      "interpretation": "Blokkonsistens verifieras, vilket indikerar att data är intakta och inte korrupta.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Warnings on block read attempts",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "Upprepade WARN-meddelanden vid försök att läsa/serva blocket till en mängd olika klientadresser.",
+      "interpretation": "Warn-nivån indikerar problem vid blockleverans, troligen på grund av nätverksproblem eller temporärt otillgängliga klienter. Blocket i sig är dock intakt.",
+      "recommended_next_step": "Övervaka om antalet sådana warnings ökar över tid; analysera nätverks- eller klientproblem om fler användare rapporterar tillgänglighetsproblem."
+    },
+    {
+      "event_type": "Successful block read",
+      "severity": "normal",
+      "supporting_log_lines": [
+        27
+      ],
+      "observation": "Ett lyckat blockleveransförsök loggas.",
+      "interpretation": "Blocket är fortsatt läsbart, vilket indikerar att det inte är korrupt.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block deletion process",
+      "severity": "normal",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket läggs till invalidSet och tas sedan bort från lagringen.",
+      "interpretation": "Normal HDFS-städrutin när block inte längre behövs eller motsvarande fil tas bort.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    }
+  ],
+  "unsupported_claims": []
+}

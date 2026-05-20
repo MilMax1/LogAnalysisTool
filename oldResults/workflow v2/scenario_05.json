@@ -1,0 +1,79 @@
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggarna visar att blocket blk_1717858812220360316 först tas emot och verifieras korrekt. Därefter inträffar flera exception/warning-meddelanden vid försök att läsa/serva blocket från olika noder, och blocket markeras som invalid och raderas från flera noder. Detta är en avvikelse från ett normalt arbetsflöde för blockhantering i HDFS.",
+  "summary": "Blocket blk_1717858812220360316 skrivs och verifieras, men orsakar sedan flera varningar och undantag under läsoperationer. Till slut markeras blocket som ogiltigt på alla noder och tas bort. Det indikerar blockkorruption eller någon annan block-relaterad anomali.",
+  "events": [
+    {
+      "event_type": "block_reception_and_replication",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas och läggs till blockkartan på tre olika DataNodes.",
+      "interpretation": "Initiala fasen av blockskrivning och replikering slutförs utan problem.",
+      "recommended_next_step": "Inga åtgärder krävs för denna fas."
+    },
+    {
+      "event_type": "block_verification_success",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket verifieras som korrekt vid tre tillfällen.",
+      "interpretation": "Vid dessa tidpunkter anses blocket vara giltigt och tillgängligt.",
+      "recommended_next_step": "Inga åtgärder om inga följande problem uppstår."
+    },
+    {
+      "event_type": "exceptions_during_block_serving",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "Upprepade undantag när blocket ska levereras till olika klienter eller noder.",
+      "interpretation": "Problemen indikerar svårigheter att läsa eller tillhandahålla blocket, vilket tyder på potentiell korruption eller I/O-problem.",
+      "recommended_next_step": "Kontrollera DataNode- och diskhälsa samt loggar för ytterligare felorsaker som kan förklara läsavbrott för blocket."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket läggs till invalidSet på samtliga DataNodes och tas bort från filsystemet.",
+      "interpretation": "Detta är åtgärder som normalt utförs när blocket betraktas som skadat eller otillgängligt. Det är inte normalt att flera repliker av ett block måste raderas samtidigt.",
+      "recommended_next_step": "Analysera orsaken till att blocket markerades som ogiltigt på alla kopior. Kontrollera DataNode- och nätverksloggar kring tidsfönstret för ytterligare rotorsak."
+    }
+  ],
+  "unsupported_claims": []
+}

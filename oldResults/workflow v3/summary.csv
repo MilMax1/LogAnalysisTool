@@ -1,0 +1,5 @@
+scenario_id,ground_truth,predicted,correct,line_count,events_count,result_file
+scenario_04,Normal,Anomaly,False,38,4,results\workflow\scenario_04.json
+scenario_05,Normal,Anomaly,False,38,4,results\workflow\scenario_05.json
+scenario_06,Anomaly,Normal,False,223,4,results\workflow\scenario_06.json
+scenario_07,Anomaly,Anomaly,True,40,4,results\workflow\scenario_07.json

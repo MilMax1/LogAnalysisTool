@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket skrivs, replikeras och verifieras framgångsrikt, följer därefter en stor mängd WARN-loggar om exception vid åtkomstförsök mot blocket från flera noder och klienter. Anmärkningsvärt är också att blocket senare markeras som invalid och raderas på samtliga noder, vilket tyder på ett större problem kring blockets användbarhet efter skapandet.",
+  "summary": "Blocket skrevs, replikerades och verifierades korrekt, men senare misslyckades flera klienter och noder att läsa ut blocket, vilket resulterade i många exception-WARNs. Blocket ogiltigförklarades och raderades slutligen.",
+  "events": [
+    {
+      "event_type": "Block creation and replication",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+      "observation": "Blocket mottogs och replikerades till flera datanoder, följt av korrekta uppdateringar till blockMap.",
+      "interpretation": "Inledande blockhantering fungerade enligt förväntan, inget fel observerat.",
+      "recommended_next_step": "Ingen åtgärd behövs för denna fas."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Verifikation av blocket lyckades vid upprepade tillfällen.",
+      "interpretation": "Blockets integritet bekräftades direkt efter skrivning.",
+      "recommended_next_step": "Ingen felsökning behövs för själva blockverifieringen."
+    },
+    {
+      "event_type": "Repeated serve exceptions",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,28,29,30,31,32],
+      "observation": "Flera WARN-rader om exception när blocket ska levereras till olika klientadresser på samtliga tre datanoder.",
+      "interpretation": "Blocket är inte tillgängligt eller kan inte levereras som förväntat till klienter och andra noder, trots lyckad skapelse och verifiering. Detta är ett tydligt tecken på ett avbrott eller inkonsekvens i systemet.",
+      "recommended_next_step": "Undersök datanodernas loggar för mer detaljer om varför serve-försöken ger exception. Kontrollera nätverksproblem, block corruption, och validera eventuella samtidiga operationer som kan påverka blockets status i klustret."
+    },
+    {
+      "event_type": "Block invalidation and deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37,38],
+      "observation": "Blocket markeras som invalid på samtliga tre datanoder och raderas.",
+      "interpretation": "Systemet har dragit slutsatsen att blocket är oanvändbart eller felaktigt (t.ex. på grund av tidigare serve-fel) och tar bort blocket ur systemet.",
+      "recommended_next_step": "Leta efter bakomliggande orsak till varför blocket ogiltigförklarats. Granska kontroll- och meta-loggar (NameNode/DataNode) samt tidigare rapporterade exceptions för att identifiera roten till blockinvalidationen."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

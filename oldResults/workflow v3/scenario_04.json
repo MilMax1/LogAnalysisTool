@@ -1,0 +1,79 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Blocket tas emot och skrivs korrekt till flera datanoder, verifiering (integritetscheck) lyckas flera gånger efter skrivning, men upprepade exception- och warning-rader uppstår konsekvent vid försök att serva blocket till olika klienter. Trots lyckad verifiering leder dessa undantag till att blocket markeras som invalid och därefter tas bort på samtliga noder. Detta händelseförlopp tyder på ett block som blir inkonsekvent eller utilgängligt för läsning, vilket avviker från ett normalt scenario.",
+  "summary": "Blocket mottas och verifieras utan fel, men vid senare åtkomstförsök genereras upprepade undantag när blocket ska serveras till klienter. Trots att blocket passerat verifiering markeras det därefter som ogiltigt och tas bort på samtliga repliker. Mönster och sekvens indikerar att blocket blivit oläsligt eller otillgängligt efter initial framgång, vilket tyder på anomal funktion i blocklivscykeln.",
+  "events": [
+    {
+      "event_type": "Block mottas och lagras",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas och lagras på flera datanoder utan fel.",
+      "interpretation": "Den initiala block-replikeringen fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för detta steg. Fortsätt övervaka blockets hälsa."
+    },
+    {
+      "event_type": "Block verifieras",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket genomgår och klarar verifieringsprocessen på datanoderna.",
+      "interpretation": "Inga tecken på datakorruption direkt efter mottagande.",
+      "recommended_next_step": "Verifiera att blocket också kan läsas efter verifiering, inte bara att det gått igenom intern kontroll."
+    },
+    {
+      "event_type": "Undantag vid block-serving",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ],
+      "observation": "När blocket försökts serveras till klienter genereras återkommande exception/warning-meddelanden från alla involverade datanoder.",
+      "interpretation": "Trots att blocket verifierats sker misslyckad åtkomst från klienter. Något gör blocket oläsligt eller otillgängligt efter verifiering. Detta är avvikande.",
+      "recommended_next_step": "Analysera detaljerade felmeddelanden för att förstå root cause till varför block-serving misslyckas trots lyckad verifiering. Kontrollera nätverksstatus, klientloggar och eventuella datanodproblem."
+    },
+    {
+      "event_type": "Blocket markeras som invalid och raderas",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket förs in i invalidSet och tas bort på samtliga noder, kort efter upprepad misslyckad åtkomst.",
+      "interpretation": "Blocket blev efter undantagen bedömt som ogiltigt och raderades. Detta sker inte vid normal blocklivscykel utan typiskt vid blockkorruption eller blockunavailablity, trots att ingen uttrycklig korruptionsindikation förekommer.",
+      "recommended_next_step": "Undersök varför blocket blev ogiltigt trots verifiering. Kontrollera blockets metadata, konsistens mellan noder och blockens tillstånd på klientsidan. Undersök om liknande mönster upprepas för andra block."
+    }
+  ],
+  "unsupported_claims": []
+}
