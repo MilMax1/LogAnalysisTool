@@ -1,0 +1,89 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket mottas, lagras och verifieras framgångsrikt, följs detta av ett stort antal exception- och warn-rader vid försök att servera blocket till olika klientadresser (rader 17-32). Ingen av dessa exception-rader följs av motsvarande recover- eller återframgångslogg, utom möjligen rad 29 med en enda lyckad serve. Strax därefter (nästa dag) markeras samtliga repliker som invalid (rader 33-35) och blocket raderas från alla noder (rader 36-38). Den normala livscykeln (create, verify, serve, delete) störs på så sätt av att så många serve-försök misslyckas och leder till invalid/deletion, vilket sammantaget är ovanligt och indikerar avvikande blockhantering.",
+  "summary": "Blocket mottas, lagras och verifieras framgångsrikt på tre noder. Därefter uppstår ett stort antal exceptioner vid försök att servera blocket till klienter. Nästan alla serve-försök misslyckas för samtliga noder. Efter cirka 11 timmar markeras blocket som invalid på alla tre noder och filen tas bort. Sammantaget tyder detta på ett block som på grund av upprepade fel i serve-fasen klassas som korrupt eller oanvändbar och därför raderas – vilket är ett anomalt förlopp.",
+  "events": [
+    {
+      "event_type": "Block mottagen och lagrad",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas av tre olika noder och lagras korrekt, enligt PacketResponder och blockMap-updateringar.",
+      "interpretation": "Inga problem med distribution, lagring eller replikering initialt.",
+      "recommended_next_step": "Ingen specifik åtgärd för just denna fas."
+    },
+    {
+      "event_type": "Block verifierad",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket verifieras som korrekt på tre tillfällen.",
+      "interpretation": "Vid tidpunkten för verifiering upptäcktes ingen felaktighet eller korruption i datat.",
+      "recommended_next_step": "Ingen specifik åtgärd för denna fas."
+    },
+    {
+      "event_type": "Flera exceptioner vid block-serve",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ],
+      "observation": "Samtliga noder får exceptioner (totalt 15) vid försök att servera blocket till olika klienter.",
+      "interpretation": "Många återkommande exceptioner indikerar att blocket inte kan läsas/serveras korrekt från någon av noderna. Att detta sker efter lyckad verifiering tyder på att blocket blivit oanvändbart utan någon samtidigt loggad återställning.",
+      "recommended_next_step": "Undersök varför blocket inte gick att servera trots tidigare verifiering. Kontrollera hårdvara, filsystemstatus eller om klienterna har kompatibilitetsproblem. Analysera om liknande mönster uppstår för andra block."
+    },
+    {
+      "event_type": "Ett lyckat serveförsök",
+      "severity": "normal",
+      "supporting_log_lines": [
+        29
+      ],
+      "observation": "En enda rad visar 'Served block ... to ...', vilket indikerar ett lyckat serve-försök.",
+      "interpretation": "Åtminstone ett lyckat serveringstillfälle skedde, men det är undantaget snarare än regeln.",
+      "recommended_next_step": "Jämför accessmönster och klientadresser mellan lyckade och misslyckade försök."
+    },
+    {
+      "event_type": "Block markeras som invalid och raderas",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Alla repliker för blocket markeras som invalid och blockfilen raderas från varje nod.",
+      "interpretation": "Att blocket blir invalid på samtliga noder och raderas kort efter exceptionerna tyder på att inte bara en nod haft problem, utan att blocket klassats som oanvändbart globalt.",
+      "recommended_next_step": "Gå igenom HDFS-metadata och NameNode-loggar för att fastställa orsak till invalid-markering samt block corruption policies. Undersök om mönstret gäller fler block eller om detta är ett isolerat fall."
+    }
+  ],
+  "unsupported_claims": []
+}

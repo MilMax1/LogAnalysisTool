@@ -1,10 +1,23 @@
 from llm_client import ask_llm
 from rule_engine import analyze_with_rules, build_structured_context
+from template_context import build_template_context
 
 
-def run_workflow(log_text: str, scenario_id: str) -> str:
+def run_workflow(log_text: str, scenario_id: str, block_id: str) -> str:
     rule_result = analyze_with_rules(log_text)
-    structured_context = build_structured_context(rule_result)
+    rule_context = build_structured_context(rule_result)
+
+    template_context = build_template_context(block_id)
+    print("----- TEMPLATE CONTEXT START -----")
+    print(template_context)
+    print("----- TEMPLATE CONTEXT END -----")
+    combined_context = f"""
+{rule_context}
+
+---
+
+{template_context}
+"""
 
     prompt = f"""
 Du analyserar ett loggscenario från HDFS, ett distribuerat filsystem.
@@ -13,12 +26,13 @@ Du får både rå loggdata och en strukturerad kontext som skapats av arbetsflö
 Använd den strukturerade kontexten som stöd, men basera slutsatser på loggraderna.
 
 Viktigt om strukturerad kontext:
-- Den strukturerade kontexten visar endast potentiellt relevanta loggrader och mönster.
-- Matchade regler eller kandidathändelser betyder inte automatiskt att scenariot är en anomali.
+- Den strukturerade kontexten visar endast potentiellt relevanta loggrader, mönster och event-template counts.
+- Matchade regler, kandidathändelser eller event counts betyder inte automatiskt att scenariot är en anomali.
+- Event-template counts är härledda från loggarna men är inte ground truth.
 - Använd kontexten som stöd för analysen, men avgör klassificeringen utifrån hela händelseförloppet.
 
 Strukturerad kontext:
-{structured_context}
+{combined_context}
 
 Uppgift:
 1. Bedöm om loggscenariot som helhet är "Normal" eller "Anomaly".

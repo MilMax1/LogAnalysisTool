@@ -14,8 +14,8 @@ SCENARIOS_DIR = PROJECT_ROOT / "scenarios"
 RESULTS_DIR = PROJECT_ROOT / "results" / "workflow"
 METADATA_PATH = SCENARIOS_DIR / "metadata.csv"
 
-#ändra till None för att köra alla scenarier
-SCENARIOS_TO_RUN = {"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
+# Pilot: ändra till None för att köra alla scenarier
+SCENARIOS_TO_RUN = {"scenario_06"} #scenario_04", "scenario_05", "scenario_06", "scenario_07
 
 
 def extract_json(text: str) -> dict:
@@ -71,6 +71,7 @@ def main() -> None:
             if not should_run_scenario(scenario_id):
                 continue
 
+            block_id = row["block_id"]
             ground_truth = normalize_label(row["label"])
             numbered_file = row["numbered_file"]
             line_count = int(row["line_count"])
@@ -85,7 +86,11 @@ def main() -> None:
 
             print(f"Kör workflow för {scenario_id} ({ground_truth})...")
 
-            raw_output = run_workflow(log_text, scenario_id=scenario_id)
+            raw_output = run_workflow(
+                log_text=log_text,
+                scenario_id=scenario_id,
+                block_id=block_id,
+            )
 
             raw_output_path = RESULTS_DIR / f"{scenario_id}_raw_output.txt"
             json_output_path = RESULTS_DIR / f"{scenario_id}.json"
