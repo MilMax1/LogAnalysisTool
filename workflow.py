@@ -8,9 +8,7 @@ def run_workflow(log_text: str, scenario_id: str, block_id: str) -> str:
     rule_context = build_structured_context(rule_result)
 
     template_context = build_template_context(block_id)
-    print("----- TEMPLATE CONTEXT START -----")
-    print(template_context)
-    print("----- TEMPLATE CONTEXT END -----")
+    
     combined_context = f"""
 {rule_context}
 
@@ -29,7 +27,9 @@ Viktigt om strukturerad kontext:
 - Den strukturerade kontexten visar endast potentiellt relevanta loggrader, mönster och event-template counts.
 - Matchade regler, kandidathändelser eller event counts betyder inte automatiskt att scenariot är en anomali.
 - Event-template counts är härledda från loggarna men är inte ground truth.
-- Använd kontexten som stöd för analysen, men avgör klassificeringen utifrån hela händelseförloppet.
+- Liknande event templates och counts kan förekomma i både normala och avvikande HDFS-traces. Använd därför event counts som stöd för struktur, inte som ensam grund för klassificering.
+- Vissa event templates kan vara diagnostiskt viktiga även om de förekommer få gånger, exempelvis templates som beskriver oväntade delete-fel, block som inte längre tillhör någon fil, failed transfer eller timeout.
+- Vanligt förekommande templates, exempelvis repeated serving exceptions, kan förekomma i både normala och avvikande traces och ska därför inte ensamma avgöra klassificeringen.
 
 Strukturerad kontext:
 {combined_context}

@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots att blocket verifieras korrekt, förekommer ett större antal 'Got exception while serving' för flera olika klienter, och blocket markeras senare som invalid och raderas på alla tre noder. Mängden och tät följd av exception-rader vid block-serving till olika klienter indikerar problem vid åtkomst/serving av blocket snarare än normal radering. I normala scenarier bör exception-rader inte upprepas i sådan omfattning innan blocket raderas; det tyder på blockinkonsistens, läsfel eller klientproblem. Ingen explicit korruption, men mönstret är inte i linje med normal livscykel.",
+  "summary": "Blocket skrivs, mottas och valideras korrekt på tre noder samt verifieras flera gånger. Vid efterföljande försök att serva blocket till olika klienter sker många exceptions på samtliga när blocket ska läsas. Dessa exception-rader indikerar problem vid block-serving. Slutligen sätts blocket som invalid på samtliga noder och raderas. Det samlade mönstret (korrekt mottagning+verifiering > många serve-exceptions > blocket invalid/raderas) pekar starkt mot ett onormalt förlop, troligen blockskada eller systeminkonsistens.",
+  "events": [
+    {
+      "event_type": "Block mottagning, replikering och lagring",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,4,6,8,10,11,12,13],
+      "observation": "Blocket mottogs och lagrades på tre olika noder/enheter i systemet.",
+      "interpretation": "Detta är normalt och visar att replikering/mottagning har fungerat.",
+      "recommended_next_step": "Ingen åtgärd, ingen anomali i mottagningsfasen."
+    },
+    {
+      "event_type": "Blockvalidering/genomgång (Verification)",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "DataBlockScanner rapporterar 'Verification succeeded' flera gånger för blocket.",
+      "interpretation": "Blocket verkar vara korrekt sparat och kan verifieras, vilket tyder på att ingen fysisk blockkorruption detekterats initialt.",
+      "recommended_next_step": "Verifiera om alla noder rapporterat korrekt i DataNode-loggar."
+    },
+    {
+      "event_type": "Stora mängder exceptions vid block-serving",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,27,28,30,31,32],
+      "observation": "15 konsekutiva WARN-rader: 'Got exception while serving blk_7854771516489510256', från tre olika datanoder till en rad olika klienter.",
+      "interpretation": "Mycket ovanligt och tecken på problem med block-serving. Det kan bero på blockcorruption, nätverksproblem, metadatafel eller inkonsistenser. Så många fel tyder inte på enstaka klientproblem utan gäller sannolikt blocket eller cluster.",
+      "recommended_next_step": "Undersök DataNode- och NameNode-loggar mer i detalj. Kontrollera blockets fysiska existens och tillstånd på alla noder. Kontrollera nätverk och eventuella clusterproblem under tidsperioden."
+    },
+    {
+      "event_type": "Blockserving lyckas i ett fall",
+      "severity": "normal",
+      "supporting_log_lines": [29],
+      "observation": "Loggart anger Served block ... to ... för en klient.",
+      "interpretation": "Det finns åtminstone ett lyckat serve-fall, dock dominerar exceptions kraftigt strax före/efter.",
+      "recommended_next_step": "Identifiera varför vissa requests kan lyckas och andra ej."
+    },
+    {
+      "event_type": "Block markeras som invalid och raderas",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37,38],
+      "observation": "Blocket läggs till invalidSet på alla tre noder och raderas, kort efter alla serving-fel.",
+      "interpretation": "Indikerar att blocket uppfattades som otjänligt eller skadat. Omedelbar invalid/radering på alla kopior är sällsynt om det ej finns någon blockkorruption eller metadatafel.",
+      "recommended_next_step": "Sök efter blockcorruption och fsck-resultat i fulla namnloggar, kontrollera varför invalid/radering utlöses (block report vs explicit delete)."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

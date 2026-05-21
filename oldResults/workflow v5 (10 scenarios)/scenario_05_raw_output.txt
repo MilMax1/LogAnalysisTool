@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Tydliga sekvensen: block tas emot och verifieras framgångsrikt flera gånger utan korruptionsfel, men ett stort antal exception-rader ('Got exception while serving') inträffar under åtkomstförsök från flera klienter och datanoder. Trots verifikation markeras blocket sedan som ogiltigt (invalidSet) och raderas. Denna kombination - återkommande serving-exceptions följt av att blocket blir invalid och forcerad radering - indikerar starkt ett onormalt och potentiellt korrupt eller otillgängligt blockförlopp.",
+  "summary": "Blocket hanteras som väntat initialt: allokering, mottagande på flera datanoder, lagring och upprepade lyckade verifieringar. Därefter uppstår ett exceptionellt mönster där hela 15 exception-rader loggas när blocket försöks läsas/serveras, vilket tyder på att blocket är korrupt, saknas eller otillgängligt från klienternas synvinkel. Slutligen sätts blocket i invalidSet och raderas från samtliga noder, vilket bekräftar att blocket blivit otillgängligt och måste tas bort. Det finns inga loggrader som indikerar en förväntad eller rent administrativ radering, så raderingen sker på grund av blockets onormala tillstånd.",
+  "events": [
+    {
+      "event_type": "Block mottas och lagras på flera noder",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket mottas från olika källor och rapporteras korrekt in till blockMap på tre noder.",
+      "interpretation": "Den initiala blockhanteringen fungerar som väntat i ett HDFS-kluster.",
+      "recommended_next_step": "Inga åtgärder krävs för mottagandet, han är standard."
+    },
+    {
+      "event_type": "Verifiering lyckas på blocket",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "DataBlockScanner bekräftar upprepade gånger att verifikationen för blocket lyckas.",
+      "interpretation": "Blocket är läsbart och inte markant korrupt direkt efter mottagande.",
+      "recommended_next_step": "Ingen åtgärd på verifiering; titta vidare på vad som sker efteråt."
+    },
+    {
+      "event_type": "Upprepade exceptions vid försök att läsa/servera blocket",
+      "severity": "anomaly",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "15 exception-rader ('Got exception while serving') loggas från samtliga tre noder när olika klientadresser försöker läsa blocket.",
+      "interpretation": "Tydligt systemfel: blocket kan inte serveras/läsas ut, trots att verifieringar tidigare lyckades. Detta är starkt avvikande från ett normalläge.",
+      "recommended_next_step": "Undersök fysiska blockfiler och loggar på de diskdrabbade noderna; kontrollera nätverksproblem, diskkorruption eller om metadata felmatchad blockstatus."
+    },
+    {
+      "event_type": "Blocket markeras som invalid och raderas från noder",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket läggs till i invalidSet och därefter initieras och genomförs radering på samtliga tre noder.",
+      "interpretation": "Blocket har slutligen diskvalificerats och raderats av systemet, sannolikt på grund av ouppnåelighet eller misstänkt korruption efter alla exceptions.",
+      "recommended_next_step": "Säkerställ att alla klientjobb som behövde blocket hanterar felet korrekt; kontrollera om liknande mönster återfinns för andra block."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

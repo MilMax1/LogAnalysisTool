@@ -1,0 +1,60 @@
+```json
+{
+  "scenario_id": "scenario_07",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket initialt hanteras korrekt och valideras, sker en längre sekvens av WARN-händelser med undantag då blocket ska serveras till olika noder. Därefter tas blocket bort, markeras som ogiltigt och raderas från flera noder, följt av ett försök att återlägga blocket till blockkartan trots att det inte längre hör till någon fil. Detta avvikande händelseförlopp indikerar ett misslyckande i blockhanteringen snarare än ett normalt avslut.",
+  "summary": "Block blk_-8531310335568756456 hanteras normalt inledningsvis, men flera på varandra följande varningar och undantag inträffar vid försök att servera blocket till olika klienter, vilket följs av invalid- och delete-händelser på samtliga repliker. Till slut görs ett misslyckat försök att återlägga blocket, vilket pekar på ett systematiskt problem med denna blocks livscykel.",
+  "events": [
+    {
+      "event_type": "block_allocation_and_replication",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+      "observation": "Blocket allokeras, tas emot och repliker distribueras till flera datanoder utan problem.",
+      "interpretation": "Normalt initialt block- och replikeringsförlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg, allt ser korrekt ut."
+    },
+    {
+      "event_type": "block_verification_success",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Samtliga blockkopior verifieras lyckat vid flera tillfällen.",
+      "interpretation": "Blocket är i gott skick under denna tidsperiod.",
+      "recommended_next_step": "Ingen åtgärd krävs; verifieringssteget är framgångsrikt."
+    },
+    {
+      "event_type": "repeated_exceptions_while_serving_block",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],
+      "observation": "Upprepade WARN-rader där datanoder får exceptions vid försök att servera blocket till många olika klienter.",
+      "interpretation": "Systematiskt och upprepat misslyckande att läsa ut blocket, trots att verifieringen tidigare nyss lyckades.",
+      "recommended_next_step": "Undersök nätverksanslutningar, blockmetadata, eventuella datakorruptioner samt varför flera noder samtidigt har problem med att tjäna ut detta block."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37],
+      "observation": "Alla kopior av blocket markeras som ogiltiga och tas bort från flera datanoder.",
+      "interpretation": "Blocket har tagits ur bruk och rensas bort som följd av ovanstående fel vid utläsning.",
+      "recommended_next_step": "Kontrollera logiken för blockinvalidiering och om det kan ha påverkats av omfattande läs-fel."
+    },
+    {
+      "event_type": "add_stored_block_to_blockmap_after_deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [38,39],
+      "observation": "addStoredBlock-anrop görs för blocket på en nod efter att det markerats som ogiltigt och raderats, men blocket hör inte längre till någon fil.",
+      "interpretation": "Möjlig inkonsekvens i blockhanteringen eller race condition där gammel blockdata försöker återintroduceras trots att filen raderats.",
+      "recommended_next_step": "Undersök om noderna har olika uppfattning om blockets giltighet/synkronisering och om det finns problem med blockkatalogen."
+    },
+    {
+      "event_type": "additional_block_deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [40],
+      "observation": "Fler delete-operationer på samma block efter att det redan är markerat som ogiltigt.",
+      "interpretation": "Systemet fortsätter att försöka städa bort blocket, vilket kan bero på race condition eller släpande metadata.",
+      "recommended_next_step": "Verifiera att blocket och dess metadata är fullt synkroniserade på samtliga noder och att det inte finns kvarhängande referenser."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

@@ -1,0 +1,42 @@
+{
+  "scenario_id": "scenario_03",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggarna visar ett komplett och normalt arbetsflöde för ett HDFS-block: blocket tas emot av flera datanoder, lagras och verifieras med lyckat resultat, och raderas senare via blockMap invalid-set och fysisk radering. Alla steg (allocering, mottagande, ackumulation, verifiering, ogiltigförklaring, fysisk radering) sker utan fel, varningar eller exception-rader. Rader som flaggar 'invalid' och 'deletion' förekommer ofta som en del av normal blocklivscykel, t.ex. i samband med filraderingar eller städning. Inga avvikelser syns i sekvensen eller innehållet i loggraderna.",
+  "summary": "Block blk_-9073992586687739851 allokeras, tas emot och lagras korrekt, verifieras flera gånger, och raderas sedan från datanoder och lokal lagring utan några fel eller misstänkta beteenden. Hela arbetsflödet följer normalt HDFS-mönster för blocklivscykel och ingen loggrad antyder problem. InvalidSet- och deletionsrader är förväntade vid blockstädning.",
+  "events": [
+    {
+      "event_type": "block_allocation_and_reception",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 6, 8, 10],
+      "observation": "Blocket tas emot från olika noder och ackumuleras korrekt.",
+      "interpretation": "Visar att blocket skrivs till flera noder som förväntat för redundans och att nätverk/skrivning fungerar normalt.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_storage_update",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blocket förs upp korrekt i blockMap på samtliga mottagande datanoder.",
+      "interpretation": "Bekräftar att metadata och blockdistributionen lyckades.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras lyckat tre gånger av DataBlockScanner.",
+      "interpretation": "Indikerar att blocket är oskadat och att ingen dataförlust eller korruption uppstått.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) och tas bort från disk på alla involverade datanoder.",
+      "interpretation": "Detta sker normalt när blocket inte längre hör till någon aktiv fil (t.ex. efter radering eller städning). Frånvaron av fel eller varningar visar att processen har gått planenligt.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    }
+  ],
+  "unsupported_claims": []
+}

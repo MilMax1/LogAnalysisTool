@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket initierades, mottogs och verifierades som korrekt vid ett flertal tillfällen, indikerar de upprepade WARN-händelserna under läsoperationer från flera datanoder återkommande problem med att leverera blocket till klienter, vilket tyder på ett avvikande eller misslyckat förlopp. Blocket flyttas sedan till invalidSet och tas bort, vilket ytterligare bekräftar att någonting gick fel med blocket i HDFS.",
+  "summary": "Blocket blk_7854771516489510256 genomgick korrekt skapande, överföring och verifiering initialt, men under senare läsoperationer inträffade flerfaldiga 'Got exception while serving' varningar på flera noder mot olika klienter. Detta åtföljdes av att blocket deklarerades ogiltigt och raderades från samtliga datanoder. Situationen är inte normal eftersom en rad misslyckade serveringsförsök föregår borttagningen, vilket antyder anomalier i blockhanteringen eller replikernas läsbarhet.",
+  "events": [
+    {
+      "event_type": "Block creation and initial storage successful",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+      "observation": "Blocket mottas av flera datanoder, blockMap uppdateras korrekt.",
+      "interpretation": "Inga tecken på problem i skrivförloppet och blocket verkar korrekt replikerat.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för dessa steg."
+    },
+    {
+      "event_type": "Block verification succeeded",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Verifiering av blocket rapporteras lyckad flera gånger.",
+      "interpretation": "Blocket var vid dessa tillfällen läsbart och intakt.",
+      "recommended_next_step": "Ingen åtgärd om inga andra problem uppstår."
+    },
+    {
+      "event_type": "Repeated exceptions serving block to clients",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,27,28,30,31,32],
+      "observation": "Varningar från flera datanoder att undantag inträffar vid försök att leverera blocket till olika klienter.",
+      "interpretation": "Ett systematiskt problem föreligger vid läsning av blocket, sannolikt på grund av korrupt block, nätverksproblem, eller access/rättighetsproblem.",
+      "recommended_next_step": "Kontrollera loggar för detaljerade felmeddelanden, undersök blockets integritet och nätverks-/resursstatus på berörda noder."
+    },
+    {
+      "event_type": "Block successfully served to client",
+      "severity": "normal",
+      "supporting_log_lines": [29],
+      "observation": "Ett läsförsök lyckas från en datanod.",
+      "interpretation": "Blocket var tillfälligt tillgängligt för åtminstone en klient.",
+      "recommended_next_step": "Notera för felsökning – jämför med misslyckade försök om detta var ett undantagsfall."
+    },
+    {
+      "event_type": "Block marked invalid and deleted",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37,38],
+      "observation": "Blocket flyttas till invalidSet på samtliga noder och tas bort.",
+      "interpretation": "Systemet identifierade blocket som ogiltigt, sannolikt på grund av tidigare accessproblem.",
+      "recommended_next_step": "Undersök varför blocket blev ogiltigt; analysera nätverk, disksystem och HDFS-integritet."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

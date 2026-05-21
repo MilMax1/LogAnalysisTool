@@ -1,0 +1,80 @@
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Flera loggrader visar först normal blockmottagning och verifiering, men därefter en längre svit av exception-rader vid försök att servera blocket. Efter många exception/warning-rader markeras blocket som ogiltigt och raderas från alla repliker, vilket kan vara förväntat om blocket är korrupt eller tillhör en förlorad fil. Dock sker sedan ett addStoredBlock-försök för ett block som enligt systemet inte längre tillhör någon fil (loggrad 38), vilket är ett ovanligt och inkonsekvent tillstånd i HDFS och tyder på ett logiskt fel. Denna kombination av mönster signalerar avvikelse jämfört med ett normalt blockförlopp.",
+  "summary": "Blocket tas emot och verifieras utan problem, men ett stort antal exception/warning-loggrader uppstår vid försök att läsa blocket. Blocket ogiltigförklaras och raderas från samtliga repliker, men det sker därefter ett försök att lägga till blocket i blockkartan trots att det inte längre tillhör någon fil. Detta onormala blockförlopp visar på logiskt inkonsekvent blockhantering i HDFS och motsvarar en anomali.",
+  "events": [
+    {
+      "event_type": "Block reception and verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket mottas och verifieras på flera noder utan fel.",
+      "interpretation": "Ingen indikation på fel vid mottagande eller initial kontroll av blocket.",
+      "recommended_next_step": "Ingen åtgärd behövs vid denna del av förloppet."
+    },
+    {
+      "event_type": "Repeated exceptions during block serving",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "Ett flertal exception/warning-rader när blocket försöker serveras till olika klienter.",
+      "interpretation": "Ett stort antal exceptioner tyder på konsistensproblem eller åtkomstproblem gällande blocket, även om vissa 'Got exception while serving block' kan vara oskyldiga varningar vid tillfälliga nätverksproblem, är mönstret utöver det normala och omfattande.",
+      "recommended_next_step": "Uppmärksamma och undersök tänkbart blockkorruption eller tillgänglighetsproblem, undersök detaljer i datanoder för orsak till exception."
+    },
+    {
+      "event_type": "Block marked invalid and deleted on all replicas",
+      "severity": "normal",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        40
+      ],
+      "observation": "Blocket markeras som ogiltigt ('invalidSet') och raderas från samtliga noder.",
+      "interpretation": "Om ett block är korrupt, saknar motsvarande fil, eller felhanteras, är det normalt att HDFS 'invalidSet'-markering och radering sker. Kan vara följd av exceptionerna ovan.",
+      "recommended_next_step": "Verifiera om blockets fil har tagits bort eller om det finns bakomliggande lagringsfel."
+    },
+    {
+      "event_type": "Attempt to add block that does not belong to any file",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        38
+      ],
+      "observation": "Efter blocket raderats sker ett försök att lägga till samma block till blockkartan, men systemet rapporterar att det inte längre tillhör någon fil.",
+      "interpretation": "Detta är ett tydligt tecken på att blockets livscykel inte slutförts konsekvent, och att någon process försöker återinföra ett överskrivet eller ogiltigt block, vilket är en anomali i HDFS.",
+      "recommended_next_step": "Undersök processflöden som försöker lägga till gamla block och kontrollera för konfigurations- eller applikationsfel som upprätthåller referenser till borttagna filer."
+    }
+  ],
+  "unsupported_claims": []
+}

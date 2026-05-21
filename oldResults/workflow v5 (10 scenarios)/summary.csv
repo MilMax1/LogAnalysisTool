@@ -1,0 +1,11 @@
+scenario_id,ground_truth,predicted,correct,line_count,events_count,result_file
+scenario_01,Normal,Normal,True,269,3,results\workflow\scenario_01.json
+scenario_02,Normal,Normal,True,22,4,results\workflow\scenario_02.json
+scenario_03,Normal,Normal,True,22,4,results\workflow\scenario_03.json
+scenario_04,Normal,Anomaly,False,38,3,results\workflow\scenario_04.json
+scenario_05,Normal,Anomaly,False,38,4,results\workflow\scenario_05.json
+scenario_06,Anomaly,Anomaly,True,223,3,results\workflow\scenario_06.json
+scenario_07,Anomaly,Anomaly,True,40,5,results\workflow\scenario_07.json
+scenario_08,Anomaly,Anomaly,True,40,4,results\workflow\scenario_08.json
+scenario_09,Anomaly,Anomaly,True,39,5,results\workflow\scenario_09.json
+scenario_10,Anomaly,Anomaly,True,8,4,results\workflow\scenario_10.json

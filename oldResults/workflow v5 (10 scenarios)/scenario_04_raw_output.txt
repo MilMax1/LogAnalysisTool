@@ -1,0 +1,34 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggsekvensen visar att blocket har tagits emot, skrivits och verifierats utan fel, men efter det uppstår ett stort antal exception-rader (15 st) vid försök att serva blocket till olika noder. Detta indikerar läsfel eller överföringsproblem trots tidigare lyckad verifiering. Till sist markeras blocket som invalid och raderas på samtliga inblandade noder, vilket antyder att Hadoop-systemet ansett blocket korrupt, otillgängligt eller på annat sätt defekt. Den mängd exception-händelser tillsammans med att blocket förklaras ogiltigt och raderas är en stark indikation på ett avvikande blockförlopp.",
+  "summary": "Blocket blk_7854771516489510256 verkar först ha tagits emot av tre datanoder och verifierats korrekt, men senare försök att serva blocket till klienter resulterar i många exception-rader. Så småningom läggs blocket till invalidSet på samtliga noder och raderas från datasystemet. Sammantaget indikerar detta ett failat scenario – blocket kunde inte längre läsas/servas till klienter vilket ledde till att det betraktades som korrupt eller defekt och städades bort.",
+  "events": [
+    {
+      "event_type": "Block mottaget, skrivet och verifierat",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13, 14, 15, 16],
+      "observation": "Blocket har tagits emot på tre olika noder, skrivits, och verifierats utan direkt fel.",
+      "interpretation": "Den tidiga delen av sekvensen tyder på ett normalt blockskriv- och verifieringsflöde.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas – blockets mottagning och verifiering lyckades."
+    },
+    {
+      "event_type": "Exception vid försök att leverera/serva blocket",
+      "severity": "anomaly",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32],
+      "observation": "Upprepade (15 st) exception-rader när blocket försöks levereras till olika klient-IP:ar.",
+      "interpretation": "Stora problem att läsa/överföra blocket från samtliga noder; konsistent misslyckande när blocket frågas av olika klienter.",
+      "recommended_next_step": "Undersök datanodernas loggar för att fastställa orsak till läsfelen (diskproblem, korrupt fil, nätverksproblem), samt analysera klientloggarna för mer detaljer om mottagna fel."
+    },
+    {
+      "event_type": "Block markeras som ogiltigt och raderas",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket flaggas som invalid på alla inblandade noder och tas bort från disk.",
+      "interpretation": "Systemet hanterar blocket som definitivt otjänligt och städar det från datanoderna, vilket är en form av självläkning vid konstaterad blockkorruption eller ihållande läsfel.",
+      "recommended_next_step": "Uppföljande analys bör spåra varför blocket blev ogiltigt samt om liknande problem påverkar fler block eller om det finns underliggande hårdvaruproblem. Kontrollera även att replikationsfaktorn i klustret skyddar mot förlust av data."
+    }
+  ],
+  "unsupported_claims": []
+}

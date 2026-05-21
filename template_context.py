@@ -8,10 +8,29 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 TEMPLATES_PATH = DATA_DIR / "HDFS.log_templates.csv"
 
-
 OCCURRENCE_PATH_CANDIDATES = [
-    DATA_DIR / "Event_occurrence_matrix.csv"
+    DATA_DIR / "Event_occurrence_matrix.csv",
+    DATA_DIR / "Event_occurance_matrix.csv",
 ]
+
+
+NOTABLE_TEMPLATE_IDS = {
+    "E7": "writeBlock received exception",
+    "E8": "PacketResponder interrupted",
+    "E10": "PacketResponder exception",
+    "E12": "Exception writing block",
+    "E14": "Exception in receiveBlock",
+    "E17": "Failed to transfer block",
+    "E20": "Unexpected delete error / BlockInfo not found",
+    "E24": "Block removed from neededReplications because it does not belong to any file",
+    "E28": "addStoredBlock request for block that does not belong to any file",
+    "E29": "PendingReplicationMonitor timed out block",
+}
+
+# relevanta men inte 100% = anomaly
+COMMON_WARNING_TEMPLATE_IDS = {
+    "E4": "Got exception while serving block",
+}
 
 
 def clean_template(template: str) -> str:
@@ -70,6 +89,8 @@ def build_template_summary(block_id: str, max_events: int = 30) -> dict[str, Any
             "block_id": block_id,
             "found": False,
             "events": [],
+            "notable_events": [],
+            "common_warning_events": [],
             "message": "Ingen event occurrence-rad hittades för block-ID.",
         }
 
@@ -90,26 +111,49 @@ def build_template_summary(block_id: str, max_events: int = 30) -> dict[str, Any
         if count <= 0:
             continue
 
-        events.append(
-            {
-                "event_id": key,
-                "count": count,
-                "template": templates.get(key, "Okänd event-template"),
-            }
-        )
+        event = {
+            "event_id": key,
+            "count": count,
+            "template": templates.get(key, "Okänd event-template"),
+        }
+
+        events.append(event)
 
     
     events.sort(key=lambda event: event["count"], reverse=True)
+
+    notable_events = [
+        {
+            **event,
+            "note": NOTABLE_TEMPLATE_IDS[event["event_id"]],
+        }
+        for event in events
+        if event["event_id"] in NOTABLE_TEMPLATE_IDS
+    ]
+
+    common_warning_events = [
+        {
+            **event,
+            "note": COMMON_WARNING_TEMPLATE_IDS[event["event_id"]],
+        }
+        for event in events
+        if event["event_id"] in COMMON_WARNING_TEMPLATE_IDS
+    ]
 
     return {
         "block_id": block_id,
         "found": True,
         "events": events[:max_events],
+        "notable_events": notable_events,
+        "common_warning_events": common_warning_events,
         "total_nonzero_event_types": len(events),
     }
 
 
 def build_template_context(block_id: str, max_events: int = 30) -> str:
+    """
+    Bygger text som kan läggas in i workflowets structured context.
+    """
     summary = build_template_summary(block_id, max_events=max_events)
 
     lines = [
@@ -120,6 +164,8 @@ def build_template_context(block_id: str, max_events: int = 30) -> str:
         "- Event counts visar hur många gånger respektive template förekommer för detta block.",
         "- Kontexten innehåller endast event-ID, event counts och event templates som är härledda från loggarna.",
         "- Event counts är inte facit och betyder inte automatiskt att scenariot är Normal eller Anomaly.",
+        "- Liknande event templates och counts kan förekomma i både normala och avvikande HDFS-traces.",
+        "- Använd därför event counts som stöd för struktur, inte som ensam grund för klassificering.",
         "",
         f"Block-ID: {block_id}",
     ]
@@ -131,6 +177,31 @@ def build_template_context(block_id: str, max_events: int = 30) -> str:
     lines.append(
         f"- Antal event-typer med count > 0: {summary['total_nonzero_event_types']}"
     )
+
+    lines.append("")
+    lines.append("Särskilt noterbara templates:")
+
+    if not summary["notable_events"]:
+        lines.append("- Inga särskilt noterbara templates förekommer i detta block.")
+    else:
+        for event in summary["notable_events"]:
+            lines.append(
+                f"- {event['event_id']} | count={event['count']} | "
+                f"note={event['note']} | template={event['template']}"
+            )
+
+    lines.append("")
+    lines.append("Vanliga varnings-/exception-templates som ska tolkas försiktigt:")
+
+    if not summary["common_warning_events"]:
+        lines.append("- Inga vanliga varnings-/exception-templates förekommer i detta block.")
+    else:
+        for event in summary["common_warning_events"]:
+            lines.append(
+                f"- {event['event_id']} | count={event['count']} | "
+                f"note={event['note']} | template={event['template']}"
+            )
+
     lines.append("")
     lines.append("Event counts:")
 

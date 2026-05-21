@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket verkar skrivas och verifieras korrekt inledningsvis, uppstår omfattande återkommande varningar (WARN) vid försök att läsa ut blocket från flera DataNodes, följt av att blocket flaggas som ogiltigt (invalidSet) på samtliga noder och därefter tas bort. Blocket återkommer även i blockMap utan att tillhöra någon fil, vilket indikerar inkonsekvent blockhantering.",
+  "summary": "Hanteringen av block blk_3947106522258141922 inleds normalt med korrekt mottagning, lagring och verifiering. Därefter uppstår flerfaldiga varningar om läsfel när blocket ska levereras till klienter, och blocket raderas senare från samtliga DataNodes. Ett försök att återintegrera blocket i blockMap sker trots att det inte längre tillhör någon fil, vilket tyder på systeminkonsistens.",
+  "events": [
+    {
+      "event_type": "block_receive_and_verification",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+      "observation": "Blocket mottas av flera DataNodes, blockMap uppdateras för samtliga noder och verifiering av blocket lyckas vid upprepade tillfällen.",
+      "interpretation": "Inledningsvis sker blocköverföring och validering så som förväntat i ett normalt scenario.",
+      "recommended_next_step": "Ingen åtgärd krävs i detta skede."
+    },
+    {
+      "event_type": "repeated_block_read_failures",
+      "severity": "warning",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,28,29,30,31,32],
+      "observation": "Upprepade WARN-loggar om exception vid utläsning av blocket till olika klienter från flera DataNodes.",
+      "interpretation": "Det finns konsekventa problem vid läsoperationer mot blocket, vilket tyder på att blocket är otillgängligt eller skadat.",
+      "recommended_next_step": "Analysera underliggande orsak till exceptions, exempelvis kontrollera DataNode-status, blockintegritet och nätverksproblem."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [33,34,35,36,37,40],
+      "observation": "Blocket läggs i invalidSet för samtliga involverade DataNodes, och loggar visar att blocket tas bort från datasystemet.",
+      "interpretation": "Att blocket raderas på detta sätt efter upprepade fel är avvikande och visar på misslyckad blockhantering.",
+      "recommended_next_step": "Kontrollera varför blocket markerats som invalid, undersök korruption eller metadatafel. Kontrollera även file-system consistency-checker."
+    },
+    {
+      "event_type": "block_reappears_unmapped",
+      "severity": "anomaly",
+      "supporting_log_lines": [38,39],
+      "observation": "Ett addStoredBlock-anrop mottas för blocket, men blocket tillhör inte någon fil längre, trots att blockMap uppdaterades.",
+      "interpretation": "Detta tyder på inkonsekvent eller misslyckad blockhantering i namnrymden.",
+      "recommended_next_step": "Verifiera namespace och blockMap-konsistens. Granska logs för att se om fler block uppvisar liknande problem."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

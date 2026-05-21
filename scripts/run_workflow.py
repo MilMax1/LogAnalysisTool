@@ -7,15 +7,15 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(PROJECT_ROOT))
 
-from workflow import run_workflow  # noqa: E402
+from workflow import run_workflow  
 
 
 SCENARIOS_DIR = PROJECT_ROOT / "scenarios"
 RESULTS_DIR = PROJECT_ROOT / "results" / "workflow"
 METADATA_PATH = SCENARIOS_DIR / "metadata.csv"
 
-# Pilot: ändra till None för att köra alla scenarier
-SCENARIOS_TO_RUN = {"scenario_06"} #scenario_04", "scenario_05", "scenario_06", "scenario_07
+
+SCENARIOS_TO_RUN = None #{"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
 
 
 def extract_json(text: str) -> dict:

@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Blockförloppet visar ett komplett och förväntat livscykelförlopp i HDFS: blocket mottas, lagras på flera DataNodes, verifieras, tjänas ut och raderas/invalideras utan några varnings-, error- eller exception-meddelanden. Block-deletion och block-invalidering är normala steg när en fil tas bort eller blocket inte längre behövs. Inga loggrader indikerar fel eller avvikande beteende.",
+  "summary": "Loggsekvensen visar att blocket skapas, distribueras till flera DataNodes, hanteras normalt av PacketResponder, verifieras två gånger och raderas sedan från samtliga inblandade noder med motsvarande block-invalidering. Mönstret och tidsflödet motsvarar normal fil- eller blockradering i HDFS utan några tecken på fel.",
+  "events": [
+    {
+      "event_type": "Block mottas och distribueras",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas från flera källor, lagras och blockMap uppdateras för respektive DataNode.",
+      "interpretation": "Blockdistribuering och replikering fungerar enligt HDFS-design.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block verifiering",
+      "severity": "normal",
+      "supporting_log_lines": [
+        15,
+        16
+      ],
+      "observation": "Blocket verifieras (checksumma/konsistenskontroll) vid två tillfällen och godkänns.",
+      "interpretation": "Blocket är intakt och konsistent under sin aktiva livstid.",
+      "recommended_next_step": "Om ytterligare undersökning krävs, kontrollera fler block för att bekräfta systemhälsan."
+    },
+    {
+      "event_type": "Block raderas och markeras som invalid",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket tas bort från alla inblandade DataNodes och läggs till respektive invalidSet.",
+      "interpretation": "Detta är en del av normal blockhantering vid exempelvis filerasure, sytemstädning eller replica under-replication-korrigering.",
+      "recommended_next_step": "Om oväntad borttagning misstänks, återbesök varför originalfilen togs bort. Annars ingen åtgärd."
+    },
+    {
+      "event_type": "Block används efter replikering",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14
+      ],
+      "observation": "Blocket serveras till klient efter att ha distribuerats.",
+      "interpretation": "Blocket var tillgängligt och användbart medan det var lagrat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    }
+  ],
+  "unsupported_claims": []
+}

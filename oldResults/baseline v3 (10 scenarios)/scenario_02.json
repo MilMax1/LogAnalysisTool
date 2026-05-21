@@ -1,0 +1,72 @@
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla steg i blockets livscykel visas: blocket tas emot av flera DataNodes, lagras och replikeringens packet responders avslutas normalt, blocken verifieras utan fel, och raderas senare enligt förväntad policy. Inga varnings- eller felmeddelanden förekommer; alla loggrader är INFO.",
+  "summary": "Blocket mottas, lagras framgångsrikt på tre DataNodes, verifieras utan problem och raderas från alla noder enligt normal HDFS-policy. Loggraderna visar inga felsteg eller avvikelser.",
+  "events": [
+    {
+      "event_type": "block_received_on_datanodes",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10
+      ],
+      "observation": "Blocket mottas och rapporteras som mottaget på tre olika DataNodes.",
+      "interpretation": "Blockreplikering fungerar som förväntat, inga avvikelser i datamottagning, korrekt blockstorlek på alla noder.",
+      "recommended_next_step": "Ingen åtgärd krävs, verifiera endast om detta är förväntat enligt arbetsflödet."
+    },
+    {
+      "event_type": "block_map_update",
+      "severity": "normal",
+      "supporting_log_lines": [
+        11,
+        12,
+        13
+      ],
+      "observation": "blockMap uppdateras för samtliga tre noder.",
+      "interpretation": "Blocket är synligt och korrekt lagrat i NameNode:s blockkarta.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        15,
+        16
+      ],
+      "observation": "Verifikation lyckas för det aktuella blocket.",
+      "interpretation": "Ingen inkonsistens eller korrupt block upptäcks vid automatiserad blockverifiering.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket sätts som invaliderat ('invalidSet') på samtliga noder.",
+      "interpretation": "Blocket raderas enligt normal HDFS-policy (t.ex. fil raderad eller överskriven).",
+      "recommended_next_step": "Granska om radering matchar förväntade användar- eller systemaktiviteter om behov finns."
+    },
+    {
+      "event_type": "block_file_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        20,
+        21,
+        22
+      ],
+      "observation": "Blockfilen tas bort från disk på alla involverade DataNodes.",
+      "interpretation": "Fysisk blockradering lyckas utan problem.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    }
+  ],
+  "unsupported_claims": []
+}

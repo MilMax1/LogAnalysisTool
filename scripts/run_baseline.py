@@ -16,7 +16,7 @@ METADATA_PATH = SCENARIOS_DIR / "metadata.csv"
 
 
 # ändra till None eller skriv om för att köra alla scenarier
-SCENARIOS_TO_RUN = {"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
+SCENARIOS_TO_RUN = None #{"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
 
 
 def extract_json(text: str) -> dict:

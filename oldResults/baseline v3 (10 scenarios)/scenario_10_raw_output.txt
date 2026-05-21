@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Flera blockoperationer för samma block misslyckas med undantag relaterade till nätverksproblem (SocketTimeoutException, EOFException, Connection reset by peer) och flera involverade komponenter påverkas. Händelseförloppet indikerar ett sammanhängande fel snarare än enstaka avvikelser.",
+  "summary": "Blockhantering för blk_-3102267849859399193 misslyckas upprepade gånger på grund av återkommande nätverksrelaterade undantag, vilket tyder på att blocket inte kan skrivas eller överföras korrekt.",
+  "events": [
+    {
+      "event_type": "Blockallocation",
+      "severity": "normal",
+      "supporting_log_lines": [3],
+      "observation": "BLOCK* NameSystem.allocateBlock: /user/root/rand/... blk_-3102267849859399193",
+      "interpretation": "Blocket allokeras som en normal del av filsystemets drift.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "ReceivingBlock",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2],
+      "observation": "Mottagning av block blk_-3102267849859399193 initieras från två olika källportar.",
+      "interpretation": "DataNode tar emot nytt block enligt ordinarie procedur.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "SocketTimeoutException",
+      "severity": "anomaly",
+      "supporting_log_lines": [4],
+      "observation": "writeBlock blk_-3102267849859399193 mottog undantaget java.net.SocketTimeoutException.",
+      "interpretation": "Timeout i nätverkskommunikationen vid blockskrivning, vilket avbryter blocköverföringen.",
+      "recommended_next_step": "Undersök nätverksproblem och eventuella belastningsproblem på DataNode eller dess nätverk."
+    },
+    {
+      "event_type": "PacketResponderTermination/EOFException",
+      "severity": "anomaly",
+      "supporting_log_lines": [5, 6],
+      "observation": "PacketResponder för blocket terminerar med java.io.EOFException.",
+      "interpretation": "Nätverks- eller strömavbrott mellan DataNode och klient resulterar i ofullständig blockhantering.",
+      "recommended_next_step": "Undersök kopplingen mellan DataNode och övriga noder/klient. Kontrollera loggar på involverade parter."
+    },
+    {
+      "event_type": "ConnectionResetByPeer",
+      "severity": "anomaly",
+      "supporting_log_lines": [7, 8],
+      "observation": "Exception vid mottagning/skrivning av block: Connection reset by peer.",
+      "interpretation": "Sambandet mellan klient och DataNode bröts oväntat, vilket leder till misslyckad blocköverföring.",
+      "recommended_next_step": "Kontrollera klientloggar, nätverksstatus och eventuella tidsgränser för anslutningar."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

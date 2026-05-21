@@ -1,0 +1,42 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Flera exception-loggrader av olika typer (SocketTimeoutException, EOFException, IOException: Connection reset by peer) inträffar i tidsföljd under hantering av samma block. Händelseförloppet visar att överföringen/skrivningen av blocket avbryts på grund av nätverksproblem och underliggande I/O-fel, vilket tyder på att blockoperationen misslyckades och att detta avviker från ett normalt flöde. Det finns ingen indikation på att blocket lyckades slutföras.",
+  "summary": "Blocktransfer för blk_-3102267849859399193 påbörjas, men upprepade undantag och förbindelseproblem (timeout, EOF, connection reset) leder till att processen misslyckas. Scenariot pekar på ett instabilt eller avbrutet blockförlopp, vilket klassificeras som en anomalitet då blocköverföringen inte avslutas normalt.",
+  "events": [
+    {
+      "event_type": "Blocktransfer initiated",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3],
+      "observation": "Block blk_-3102267849859399193 börjar tas emot på DataNode, och ett nytt block tilldelas av namenode.",
+      "interpretation": "Starten av blocköverföringen sker som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "Block write receives SocketTimeoutException",
+      "severity": "anomaly",
+      "supporting_log_lines": [4],
+      "observation": "writeBlock-operationen för blocket resulterar i en java.net.SocketTimeoutException.",
+      "interpretation": "Timeout vid blockskrivning tyder på nätverksproblem eller serverhinder, vilket avbryter blockoperationen.",
+      "recommended_next_step": "Kontrollera nätverksstabilitet och eventuella flaskhalsar i blocköverföringen mellan DataNodes."
+    },
+    {
+      "event_type": "PacketResponder EOFException",
+      "severity": "anomaly",
+      "supporting_log_lines": [6],
+      "observation": "PacketResponder för blocket kastar java.io.EOFException.",
+      "interpretation": "Ett oväntat slut på dataströmmen visar på att förbindelsen avbröts eller att klienten stängde anslutningen abrupt.",
+      "recommended_next_step": "Undersök loggar för närliggande noder för att hitta orsaker till avbruten anslutning (exempelvis klientkrascher eller nätverksavbrott)."
+    },
+    {
+      "event_type": "Exception in receiveBlock: Connection reset by peer",
+      "severity": "anomaly",
+      "supporting_log_lines": [7, 8],
+      "observation": "Både BlockReceiver och DataXceiver får IOException: Connection reset by peer vid hantering av samma block.",
+      "interpretation": "Förbindelsen till motparten bröts oväntat och överföringssessionen stängdes tvärt, vilket är ett avvikande och felaktigt förlopp.",
+      "recommended_next_step": "Felsök motpartens (sannolikt en annan DataNode eller klient) loggar för att se varför anslutningen återställdes."
+    }
+  ],
+  "unsupported_claims": []
+}

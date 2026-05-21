@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_03",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO, blocket allokeras, mottas, replikeras och verifieras framgångsrikt flera gånger innan det till sist tas bort på förväntade sätt. Inga varningar, fel eller tecken på misslyckande finns i händelseförloppet.",
+  "summary": "Blocket blk_-9073992586687739851 allokeras, skrivs till flera DataNodes, verifieras lyckat upprepade gånger och tas senare bort/ogiltigförklaras samt raderas utan avvikande loggmeddelanden eller fel.",
+  "events": [
+    {
+      "event_type": "Block allocation and write initiation",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2],
+      "observation": "Blocket initieras och allokeras för skrivning av NameNode och DataNodes.",
+      "interpretation": "Start på en normal blockskrivningscykel i HDFS.",
+      "recommended_next_step": "Ingen åtgärd behövs; processen är som förväntat."
+    },
+    {
+      "event_type": "Block write, replication and confirmation",
+      "severity": "normal",
+      "supporting_log_lines": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket skrivs till tre olika DataNodes. PacketResponder loggar korrekt terminering och mottagna block. blockMap uppdateras för alla repliker.",
+      "interpretation": "Blocket är framgångsrikt skrivet och replikerat enligt krav.",
+      "recommended_next_step": "Ingen åtgärd; blockskrivning och replikering är normal."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Upprepade lyckade verifieringar för blocket registreras av DataBlockScanner.",
+      "interpretation": "Datablocket läses och valideras ok på disk flera gånger.",
+      "recommended_next_step": "Ingen åtgärd; blockverifiering fungerar korrekt."
+    },
+    {
+      "event_type": "Scheduled block invalidation and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket flaggas för borttagning hos samtliga involverade DataNodes och raderas därefter från deras lokal lagring.",
+      "interpretation": "Detta är ett normalt steg i HDFS där block raderas när de inte längre behövs.",
+      "recommended_next_step": "Om inte blocket borde varit kvar, ingen åtgärd. Annars, undersök varför filen/blocket raderades."
+    }
+  ],
+  "unsupported_claims": []
+}
+```
