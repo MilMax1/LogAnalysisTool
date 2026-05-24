@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_13",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggförloppet för block blk_-4334049176684001514 visar ett typiskt livscykelförlopp i HDFS: blocket tas emot och lagras på flera datanoder, blockMap uppdateras, och blocket markeras senare som ogiltigt (invalid)/raderas från samtliga noder. Inga fel, varningar eller exception förekommer. Inga tecken på misslyckade blockkopieringar, korruption eller oväntad blockhantering kan observeras i loggrraderna. Att radering och invalidSet-ändringar sker är normalt när en block inte längre är associerad med en fil (t.ex. efter en delete eller overwrite).",
+  "summary": "Blocket tas emot och lagras korrekt på flera noder, därefter tas det bort och rensas från samtliga noder utan några fel. Inga avvikelser, varningar eller felrapporter förekommer. Loggsekvensen är typisk för block-deletion i HDFS efter t.ex. en filradering eller omblockering.",
+  "events": [
+    {
+      "event_type": "block_allocation",
+      "severity": "normal",
+      "supporting_log_lines": [1],
+      "observation": "Block blk_-4334049176684001514 allokeras för en ny fil.",
+      "interpretation": "Blockets livscykel startas enligt normal procedur.",
+      "recommended_next_step": "Ingen åtgärd nödvändig."
+    },
+    {
+      "event_type": "block_reception",
+      "severity": "normal",
+      "supporting_log_lines": [2,3,4,6,8,10],
+      "observation": "Blocket tas emot flera gånger från olika source-noder till destination-datanoder och bekräftas som mottaget på rätt storlek.",
+      "interpretation": "Blocket distribueras korrekt i systemet till sina replikas.",
+      "recommended_next_step": "Ingen åtgärd nödvändig."
+    },
+    {
+      "event_type": "block_map_update",
+      "severity": "normal",
+      "supporting_log_lines": [11,12,13],
+      "observation": "blockMap uppdateras med blockets placering på respektive datanod.",
+      "interpretation": "Metadata i NameNode hålls uppdaterat, inga tecken på missmatchning.",
+      "recommended_next_step": "Ingen åtgärd nödvändig."
+    },
+    {
+      "event_type": "block_invalid_marking",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Blocket markeras som invalid på samtliga noder.",
+      "interpretation": "Detta sker normalt när blocket inte längre används av någon fil, t.ex. efter en radering.",
+      "recommended_next_step": "Bekräfta att detta sammanfaller med en filradering eller ersättning om ytterligare bekräftelse behövs."
+    },
+    {
+      "event_type": "block_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17,18,19],
+      "observation": "Blocket tas bort från disks på respektive datanod.",
+      "interpretation": "Detta är slutfasen av deletionscykeln och indikerar korrekt resursstädning.",
+      "recommended_next_step": "Ingen åtgärd nödvändig."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

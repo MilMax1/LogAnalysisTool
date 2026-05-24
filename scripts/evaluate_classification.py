@@ -2,7 +2,7 @@ from pathlib import Path
 import csv
 import sys
 
-# kör med "python evaluate_classification.py workflow" eller byt ut mot baseline
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 

@@ -9,3 +9,13 @@ scenario_07,blk_-8531310335568756456,Anomaly,scenario_07_raw.txt,scenario_07_num
 scenario_08,blk_3947106522258141922,Anomaly,scenario_08_raw.txt,scenario_08_numbered.txt,40
 scenario_09,blk_7956543127401791181,Anomaly,scenario_09_raw.txt,scenario_09_numbered.txt,39
 scenario_10,blk_-3102267849859399193,Anomaly,scenario_10_raw.txt,scenario_10_numbered.txt,8
+scenario_11,blk_4237356440788557206,Normal,scenario_11_raw.txt,scenario_11_numbered.txt,19
+scenario_12,blk_5668708402864483965,Normal,scenario_12_raw.txt,scenario_12_numbered.txt,19
+scenario_13,blk_-4334049176684001514,Normal,scenario_13_raw.txt,scenario_13_numbered.txt,19
+scenario_14,blk_709268592365361671,Normal,scenario_14_raw.txt,scenario_14_numbered.txt,19
+scenario_15,blk_-7042855855719423267,Normal,scenario_15_raw.txt,scenario_15_numbered.txt,19
+scenario_16,blk_6248210333079836276,Anomaly,scenario_16_raw.txt,scenario_16_numbered.txt,20
+scenario_17,blk_6331191059322192725,Anomaly,scenario_17_raw.txt,scenario_17_numbered.txt,20
+scenario_18,blk_8240042894352190894,Anomaly,scenario_18_raw.txt,scenario_18_numbered.txt,20
+scenario_19,blk_6426032162622263299,Anomaly,scenario_19_raw.txt,scenario_19_numbered.txt,20
+scenario_20,blk_5133973138291673173,Anomaly,scenario_20_raw.txt,scenario_20_numbered.txt,22

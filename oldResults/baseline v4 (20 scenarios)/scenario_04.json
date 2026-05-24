@@ -1,0 +1,103 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar på en framgångsrik skriv- och verifieringsfas för blocket blk_7854771516489510256, men följs av ett antal varningar om exception medan blocket serveras till klienter från flertalet datanoder. Till sist markeras blocket explicit som ogiltigt på samtliga repliker och raderas på disk. Detta antyder ett inkonsekvent och misslyckat blockförlopp trots frånvaro av ERROR-rader.",
+  "summary": "Blocket blk_7854771516489510256 skrivs och verifieras först utan problem. Flera försök att läsa blocket från olika noder leder dock till undantag vid servering mot klienter. Alla repliker av blocket klassas därefter som ogiltiga och raderas. Detta utgör en avvikande och felaktig process för blockhantering.",
+  "events": [
+    {
+      "event_type": "Block allocation and initial receipt",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "observation": "Blocket blk_7854771516489510256 initieras och börjar tas emot på tre olika noder.",
+      "interpretation": "Inledningsvis sker blockhanteringen som förväntat.",
+      "recommended_next_step": "Ingen åtgärd behövs i detta tidiga skede."
+    },
+    {
+      "event_type": "Block successfully written and replicated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas framgångsrikt och lagras på tre datanoder.",
+      "interpretation": "Replication och blockläggning fullföljs enligt normal procedur.",
+      "recommended_next_step": "Ingen åtgärd behövs baserat på detta utfall."
+    },
+    {
+      "event_type": "Successful block verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Flera lyckade blockverifieringar utförs.",
+      "interpretation": "Blocket är initialt läsbart och bedöms korrekt på disken.",
+      "recommended_next_step": "Ingen omedelbar åtgärd behövs; blocket uppvisar inga fel än."
+    },
+    {
+      "event_type": "Multiple exceptions during client reads",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ],
+      "observation": "Återkommande varningar om undantag när blocket ska serveras till klienter från flera olika noder.",
+      "interpretation": "Det sker omfattande och repetitiva problem vid försök att läsa ut blocket, som inte kan förklaras av tillfällig nätverksstörning eller enstaka klientproblem.",
+      "recommended_next_step": "Undersök blockets korruptionstillstånd och felsök varför blocket inte kan serveras trots tidigare verifiering. Kontrollera även nätverkskommunikation och DN-loggar för detaljerade felorsaker."
+    },
+    {
+      "event_type": "Block marked as invalid on all replicas",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35
+      ],
+      "observation": "Blocket markeras som ogiltigt ('invalidSet') på samtliga noder där det lagras.",
+      "interpretation": "Systemet har upptäckt att blocket inte längre är betrott, sannolikt pga felaktigheter upptäckta efter tidigare verifiering.",
+      "recommended_next_step": "Ta reda på varför blocket blivit ogiltigförklarat efter lyckad verifiering. Kontrollera för buggar i blockhanteringen och eventuellt inkompatibla klientförfrågningar."
+    },
+    {
+      "event_type": "Block deletion on all datanodes",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket raderas på disk från alla berörda datanoder.",
+      "interpretation": "Blocket tas permanent bort, vilket markerar irreversibelt fel eller konsistensproblem.",
+      "recommended_next_step": "Granska helhetsscenariot för dataförlust. Verifiera eventuella sidoeffekter och se över rutiner för blockvalidering och felåtgärder."
+    }
+  ],
+  "unsupported_claims": [
+    "Exakt orsak till varför blocket blev ogiltigförklarat och varför undantag rapporteras vid läsning framgår ej direkt av loggradens detaljer."
+  ]
+}

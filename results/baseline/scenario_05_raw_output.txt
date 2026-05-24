@@ -1,0 +1,39 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots att blocket först verkar skrivas och verifieras korrekt, uppträder ett stort antal WARN-rader om exception vid försök att serva blocket till olika klienter. Detta är flerfaldigt och återkommande, vilket tyder på ett systematiskt problem snarare än enstaka fel. Ingen ERROR-logg finns, men mönstret av många varningar och misslyckade blockleveranser är avvikande. Blocket tas senare bort, vilket kan vara normalt, men det föregås av dessa avvikelser.",
+  "summary": "Blocket blk_1717858812220360316 skrivs och verifieras först utan problem, men därefter uppstår många varningar om exception vid försök att serva blocket till flera olika klienter. Detta tyder på att blocket inte kunnat levereras korrekt under en period. Blocket tas senare bort från systemet.",
+  "events": [
+    {
+      "event_type": "Block mottagen och verifierad",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      "observation": "Blocket tas emot, lagras på flera noder och verifieras upprepade gånger utan fel.",
+      "interpretation": "Blocket skrivs och replikeras korrekt enligt normal HDFS-process.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas."
+    },
+    {
+      "event_type": "Upprepade undantag vid blockleverans",
+      "severity": "anomaly",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Många WARN-rader om exception när blocket ska levereras till olika klienter.",
+      "interpretation": "Blocket kan inte levereras korrekt till flera klienter, vilket tyder på ett systematiskt problem med blocket eller dess tillgänglighet.",
+      "recommended_next_step": "Undersök loggar på klient- och datanodssidan för att identifiera orsaken till undantagen. Kontrollera nätverksstatus och blockets integritet."
+    },
+    {
+      "event_type": "Block tas bort från systemet",
+      "severity": "normal",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket läggs till invalidSet och tas bort från filsystemet.",
+      "interpretation": "Blocket tas bort enligt HDFS-rutiner, vilket kan vara normalt efter att det blivit ogiltigt eller inte längre behövs.",
+      "recommended_next_step": "Verifiera att blockborttagningen är förväntad och att inga beroende processer påverkas."
+    }
+  ],
+  "unsupported_claims": [
+    "Orsaken till undantagen (exakt feltyp eller rotorsak) framgår inte av loggraden.",
+    "Det är inte säkert om blocket togs bort på grund av undantagen eller av andra skäl (t.ex. normal filradering)."
+  ]
+}
+```

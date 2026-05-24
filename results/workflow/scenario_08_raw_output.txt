@@ -1,0 +1,47 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar att blocket först tas emot och verifieras utan problem, men därefter uppstår upprepade exception-rader vid försök att leverera blocket till flera olika klienter. Slutligen markeras blocket som invalid och raderas från samtliga noder. Efter radering försöker systemet återigen lägga till blocket, men får då beskedet att blocket inte längre tillhör någon fil. Denna sekvens – särskilt kombinationen av många exception-rader vid block-serving, följt av invalidation och radering, samt ett explicit loggmeddelande om att blocket inte längre tillhör någon fil – indikerar ett avvikande och inkonsekvent blockförlopp.",
+  "summary": "Blocket blk_3947106522258141922 mottas och verifieras korrekt, men därefter misslyckas upprepade försök att leverera blocket till klienter (många exception-rader). Blocket markeras sedan som invalid och raderas från alla noder. Efter radering försöker systemet återigen lägga till blocket, men får beskedet att det inte längre tillhör någon fil. Detta är inte ett normalt blockförlopp och indikerar en anomali i blockhanteringen.",
+  "events": [
+    {
+      "event_type": "Block mottas och verifieras",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 9, 10, 12, 13, 14, 15, 16],
+      "observation": "Blocket tas emot från flera källor, lagras på flera noder och verifieras tre gånger utan fel.",
+      "interpretation": "Blocket skrivs och replikeras korrekt i början av förloppet.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del, då blockmottagning och verifiering fungerar som förväntat."
+    },
+    {
+      "event_type": "Upprepade exception vid block-serving",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Flera WARN-rader med 'Got exception while serving blk_3947106522258141922 to ...' för olika klienter och noder.",
+      "interpretation": "Blocket kan inte levereras till klienter, vilket tyder på problem med blockets tillgänglighet eller integritet.",
+      "recommended_next_step": "Undersök varför block-serving misslyckas – kontrollera nätverksproblem, blockkorruption eller metadata-inkonsistens."
+    },
+    {
+      "event_type": "Block markeras som invalid och raderas",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 40],
+      "observation": "Blocket läggs till invalidSet på samtliga noder och raderas därefter från filsystemet.",
+      "interpretation": "Systemet anser att blocket är ogiltigt och tar bort det från alla noder, vilket är ovanligt efter en lyckad verifiering.",
+      "recommended_next_step": "Analysera varför blocket blev invalid – kontrollera blockets metadata och eventuella race conditions i blockhanteringen."
+    },
+    {
+      "event_type": "Försök att åter-lägga till blocket efter radering",
+      "severity": "anomaly",
+      "supporting_log_lines": [38, 39],
+      "observation": "Efter radering försöker systemet lägga till blocket igen, men får beskedet att det inte längre tillhör någon fil.",
+      "interpretation": "Detta tyder på inkonsistens mellan blockmetadata och filsystemets tillstånd.",
+      "recommended_next_step": "Granska filsystemets metadatahantering och block-map för att identifiera orsaken till inkonsistensen."
+    }
+  ],
+  "unsupported_claims": [
+    "Det finns inget explicit stöd i loggarna för att blocket är korrupt (ingen 'corruption' eller 'failure' keyword).",
+    "Det finns inget explicit stöd för att exception-raderna beror på nätverksproblem snarare än block- eller metadatafel."
+  ]
+}
+```

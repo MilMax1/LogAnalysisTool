@@ -1,0 +1,47 @@
+```json
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Block blk_7854771516489510256 genomgår mottagning, skrivning och verifiering utan problem initialt. Sedan följer dock ett stort antal WARN-rader om exception när blocket ska läsas/servas till klienter (rader 17-32). Slutligen markeras blocket som invalid och raderas (rader 33-38). Trots lyckad verifiering och inga tecken på korruption eller failed transfer, indikerar det upprepade misslyckandet vid försök att läsa ut blocket, följt av radering, på ett avvikande och misslyckat blockflöde snarare än normal livscykel.",
+  "summary": "Blocket mottas, skrivs och verifieras utan problem men kan därefter inte levereras till flera klienter då exception uppstår vid varje försök. Blocket markeras därför som invalid och tas bort. Detta visar på ett misslyckat flöde och avvikelse från normal hantering.",
+  "events": [
+    {
+      "event_type": "block reception and storage",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket tas emot via flera DataNodes och lagras utan problem.",
+      "interpretation": "Normal blockmottagning och lagring.",
+      "recommended_next_step": "Ingen åtgärd krävs för mottagningen."
+    },
+    {
+      "event_type": "block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras framgångsrikt tre gånger.",
+      "interpretation": "Ingen indikation på dataförlust eller korruption.",
+      "recommended_next_step": "Ingen åtgärd krävs kring verifieringen."
+    },
+    {
+      "event_type": "serving exceptions",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32],
+      "observation": "Stora mängder WARN-rader om exception vid försök att 'serva' ut blocket till många olika klienter/adresser.",
+      "interpretation": "Något gör att blocket inte kan levereras/sändas korrekt trots att det är verifierat. Orsak till exception anges dock ej i loggradens text.",
+      "recommended_next_step": "Analysera exakt felmeddelande i exception-utskriften (om sådan finns på radens stack-trace, ej inkluderad här), samt undersök om motsvarande fel syns hos klienterna."
+    },
+    {
+      "event_type": "block invalidation and deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket markeras som invalid på samtliga kopior och raderas.",
+      "interpretation": "Kombinationen av upprepade serveringsproblem och radering av block som tidigare kunde verifieras pekar på ett misslyckat och därmed avvikande blockflöde. Det är ovanligt att block som kan verifieras ändå måste raderas p.g.a. serveringsproblem.",
+      "recommended_next_step": "Felsök varför blocket inte kan levereras trots verifierad integritet: kontrollera eventuella nätverksproblem, permissions, DataNode-/klientloggar för detaljerad exception-stacktrace, och undersök HDFS-konfiguration för edge-fall vid block serving."
+    }
+  ],
+  "unsupported_claims": [
+    "Det syns ingen indikation på datakorruption eller hardware failure; endast att blocket inte gick att leverera.",
+    "Det framgår ej varför exception inträffar när blocket servas; det kan bero på olika orsaker såsom kommunikationsproblem, permissions eller interna buggar."
+  ]
+}
+```

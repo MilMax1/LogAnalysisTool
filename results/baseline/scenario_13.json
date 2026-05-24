@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_13",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett normalt förlopp för blockallokering, mottagning, lagring, ogiltigförklaring och borttagning. Inga tecken på fel, varningar eller inkonsekvenser i blockhanteringen. Blocket tas bort enligt förväntat förlopp.",
+  "summary": "Blocket blk_-4334049176684001514 allokeras, tas emot av flera datanoder, lagras och läggs till blockkartan. Senare markeras blocket som ogiltigt på samtliga noder och tas bort från filsystemet. Inga fel eller varningar förekommer.",
+  "events": [
+    {
+      "event_type": "Block allocation and reception",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "observation": "Blocket allokeras och mottas av flera datanoder.",
+      "interpretation": "Detta är ett normalt steg i HDFS när ett nytt block skrivs.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block successfully stored",
+      "severity": "normal",
+      "supporting_log_lines": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket lagras och blockkartan uppdateras för samtliga noder.",
+      "interpretation": "Blocket har lagrats korrekt på alla avsedda datanoder.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block invalidation and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket markeras som ogiltigt och tas bort från samtliga noder.",
+      "interpretation": "Blocket har sannolikt blivit överflödigt (t.ex. temporär fil eller avslutad skrivning) och tas bort enligt normal HDFS-process.",
+      "recommended_next_step": "Ingen åtgärd krävs om inte blocket förväntades finnas kvar."
+    }
+  ],
+  "unsupported_claims": []
+}

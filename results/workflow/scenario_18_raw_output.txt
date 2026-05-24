@@ -1,0 +1,39 @@
+```json
+{
+  "scenario_id": "scenario_18",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Loggsekvensen visar ett i övrigt normalt blockmottagande och lagring, följt av att blocket markeras som ogiltigt och raderas från samtliga noder. Dock uppstår ett oväntat fel vid radering (rad 18: 'Unexpected error trying to delete block ... BlockInfo not found in volumeMap'), vilket tyder på inkonsistens i blockhanteringen. Detta är inte ett normalt förlopp och indikerar en avvikelse, även om det inte finns ERROR-rader.",
+  "summary": "Blocket mottas och lagras korrekt på flera noder, men markeras kort därefter som ogiltigt och raderas från samtliga noder. Under raderingsprocessen uppstår ett oväntat fel där blockinformationen saknas i volumeMap, vilket tyder på en inkonsistens eller potentiell bug i blockhanteringen. Detta är inte förväntat i ett normalt blockförlopp.",
+  "events": [
+    {
+      "event_type": "block_allocation_and_reception",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,6,8,10,11,12,13],
+      "observation": "Blocket blk_8240042894352190894 allokeras, tas emot och lagras på flera datanoder utan fel.",
+      "interpretation": "Blockmottagning och lagring sker enligt förväntan.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del av förloppet."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion_initiation",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16,17,19,20],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) och raderingsprocessen startar på samtliga noder.",
+      "interpretation": "Det är normalt att block kan markeras för radering, t.ex. vid filborttagning eller om blocket blivit överflödigt.",
+      "recommended_next_step": "Verifiera varför blocket blev ogiltigt om detta sker oväntat ofta."
+    },
+    {
+      "event_type": "unexpected_delete_error",
+      "severity": "anomaly",
+      "supporting_log_lines": [18],
+      "observation": "Vid radering av blocket uppstår ett oväntat fel: 'BlockInfo not found in volumeMap'.",
+      "interpretation": "Detta tyder på inkonsistens i blockhanteringen – blocket fanns inte i volumeMap när raderingen skulle ske. Detta är inte normalt och kan indikera bug, race condition eller datakorruption.",
+      "recommended_next_step": "Undersök varför BlockInfo saknas i volumeMap vid radering. Kontrollera om liknande fel uppstår för andra block, och granska eventuella samtidiga operationer eller buggar i blockhanteringen."
+    }
+  ],
+  "unsupported_claims": [
+    "Det finns inget direkt stöd i loggraderna för att blocket blivit korrupt eller att data gått förlorad, endast att blockhanteringen är inkonsistent vid radering.",
+    "Det framgår inte varför blocket blev ogiltigt (invalid), endast att det markerats och raderats."
+  ]
+}
+```

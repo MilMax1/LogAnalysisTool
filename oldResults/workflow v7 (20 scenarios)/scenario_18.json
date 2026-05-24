@@ -1,0 +1,65 @@
+{
+  "scenario_id": "scenario_18",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Majoriteten av händelseförloppet följer en typisk blocklivscykel med mottagning, lagring och senare markering som 'invalid' följt av försök till borttagning. Dock uppstår en oväntad varning (rad 18) vid borttagning: 'BlockInfo not found in volumeMap.' Detta är inte typiskt för normal blockhantering och indikerar ett potentiellt inkonsistent tillstånd mellan filsystemets metadata och den fysiska lagringen. Även om övriga rader tyder på normal blockhantering, utgör denna varning ett tecken på att blockinformationen saknas i systemets volymkarta vid deleteförsök. Detta bör betraktas som en anomal händelse.",
+  "summary": "Blocket mottas, lagras, och senare markeras alla repliker som ogiltiga och tas bort. Vid ett försök att ta bort blocket uppstår en oväntad varning eftersom blockinformationen inte går att hitta i systemets volymkarta för blockhantering. Detta tyder på en anomali i block-hanteringen och potentiell inkonsistens i systemets metadata.",
+  "events": [
+    {
+      "event_type": "Block mottas och lagras på tre datanoder",
+      "severity": "normal",
+      "supporting_log_lines": [
+        2,
+        3,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas från flera noder (2, 3, 4), mottagen och bekräftad (6, 8, 10), och blockkartan uppdateras för tre noder (11, 12, 13).",
+      "interpretation": "Normalt förlopp för blockreplikering i HDFS.",
+      "recommended_next_step": "Inga åtgärder behövs för denna del."
+    },
+    {
+      "event_type": "Block markeras som ogiltigt (invalid) på alla repliker",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket markeras som 'invalid' på alla tre noder.",
+      "interpretation": "Kan vara normal städningsmekanism om blocket t.ex. ersätts, deleteras eller anses korrupt.",
+      "recommended_next_step": "Verifiera varför blocket blev ogiltigt om okänt. Annars inga åtgärder."
+    },
+    {
+      "event_type": "Försök att ta bort blockfilerna från disk",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        19,
+        20
+      ],
+      "observation": "Loggraden visar försök att ta bort blockfiler på tre olika diskar/kataloger.",
+      "interpretation": "Del av normal borttagning av ogiltiga blockkopior.",
+      "recommended_next_step": "Kontrollera systemloggar för ytterligare fel om blockborttagning ofta misslyckas."
+    },
+    {
+      "event_type": "Varning: BlockInfo not found vid deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        18
+      ],
+      "observation": "Varning vid borttagningsförsök: 'Unexpected error trying to delete block ... BlockInfo not found in volumeMap.'",
+      "interpretation": "Filen på disk existerar, men metadata om blocket saknas i systemkartan. Detta är en inkonsistens och ovanligt i normal hantering. Potentiell datakorruption, race condition, eller tidigare misslyckad borttagning.",
+      "recommended_next_step": "Undersök om andra block har liknande problem. Kör fsck på HDFS-filsystemet för att upptäcka metadata-inkonsistenser. Granska systemloggar tillbaka i tiden för korruption, race, eller diskfel. Kontrollera HDFS-version och kända buggar för detta scenario."
+    }
+  ],
+  "unsupported_claims": [
+    "Att blocket är förlorat eller att datakorruption säkert har inträffat kan inte fastställas utifrån dessa loggrader.",
+    "Det är inte säkert att varningen lett till förlorad data eller påverkat användarfunktionalitet, då blocket även kan vara redundans eller trash."
+  ]
+}

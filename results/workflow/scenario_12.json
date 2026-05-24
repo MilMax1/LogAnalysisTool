@@ -1,0 +1,43 @@
+{
+  "scenario_id": "scenario_12",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggsekvensen visar ett komplett och konsistent blockförlopp: blocket tas emot av flera datanoder, lagras och registreras korrekt, och tas senare bort via en normal delete-process. Det finns inga fel, varningar eller undantag i loggarna. Förekomsten av invalidSet och deletion är förväntad vid normal blocklivscykel, t.ex. när blocket inte längre behövs eller filen tas bort. Inga tecken på korruption, misslyckad replikering eller oväntade fel observeras.",
+  "summary": "Blocket blk_5668708402864483965 tas emot och lagras på tre datanoder, registreras i blockkartan, och tas senare bort från samtliga noder. Alla steg sker utan fel eller varningar. Detta är typiskt för en normal blocklivscykel i HDFS, exempelvis när en temporär fil tas bort eller en fil raderas av användaren.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13
+      ],
+      "observation": "Blocket mottas och lagras på tre olika datanoder. Blockkartan uppdateras korrekt.",
+      "interpretation": "Blocket har replikerats och lagrats enligt HDFS-standard. Inga fel eller avvikelser syns i mottagande eller lagring.",
+      "recommended_next_step": "Ingen åtgärd krävs. Om blockets borttagning ska undersökas, kontrollera varför filen eller blocket togs bort (t.ex. användaråtgärd eller temporär fil)."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket markeras som invalid och raderas från samtliga datanoder.",
+      "interpretation": "Detta är normalt när en fil tas bort eller blocket inte längre behövs. Ingen indikation på felaktig blockhantering.",
+      "recommended_next_step": "Ingen åtgärd krävs. Om blockets borttagning är oväntad, kontrollera filsystemets metadata eller användarloggar för att verifiera orsaken till borttagningen."
+    }
+  ],
+  "unsupported_claims": []
+}

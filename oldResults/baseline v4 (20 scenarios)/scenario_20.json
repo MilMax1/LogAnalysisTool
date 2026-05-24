@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_20",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Hela blockets skrivning, mottagande och replikering sker utan någon indikation på fel, varningar eller inkonsekvenser i loggrader; därefter följer en normal raderingsprocess för blocket. Ingen ERROR, WARN eller oväntad loggsekvens observeras.",
+  "summary": "Blocket blk_5133973138291673173 hanteras enligt förväntan: blocket allokeras, tas emot och sparas på tre noder. Efterhand markeras blocket i invalidSet för alla noder och tas bort från filsystemet, genom en sekvens raderingshändelser. Alla steg innehåller endast INFO-loggradering och följer typiskt flöde för blockhantering och borttagning i HDFS.",
+  "events": [
+    {
+      "event_type": "Block allocation and reception",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "observation": "Blocket allokeras och börjar tas emot av flera datanoder.",
+      "interpretation": "Det är normalt att ett block tas emot av primära och replikerande datanoder i HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs; bekräfta att blocköverföringen är klar."
+    },
+    {
+      "event_type": "Block writing and confirmation",
+      "severity": "normal",
+      "supporting_log_lines": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket skrivs till tre datanoder, bekräftelser mottas om korrekt mottagning och överföringen avslutas per datanod.",
+      "interpretation": "Normal blocköverföring och -skrivning med förväntad replikationsfaktor.",
+      "recommended_next_step": "Ingen åtgärd krävs; kontrollera att blocket är replikerat enligt klusterpolicyn."
+    },
+    {
+      "event_type": "Block registration in namenode",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket registreras i blockkartan (blockMap) för samtliga noder.",
+      "interpretation": "Normalt förfarande vid replikering och blockregistrering.",
+      "recommended_next_step": "Ingen åtgärd; blockregistrering slutförd."
+    },
+    {
+      "event_type": "Block invalidation and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket läggs till invalidSet för samtliga noder och raderas därefter på disksystemet.",
+      "interpretation": "Blocket är inte längre giltigt och tas bort, vilket är normal logik t.ex. efter filradering eller omskrivning.",
+      "recommended_next_step": "Om blocket oväntat blev ogiltigt, kontrollera applikationslogik eller filsystemets policy för borttagning."
+    }
+  ],
+  "unsupported_claims": []
+}

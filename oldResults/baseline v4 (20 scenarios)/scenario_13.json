@@ -1,0 +1,83 @@
+{
+  "scenario_id": "scenario_13",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Samtliga loggrader är INFO utan tecken på misslyckanden, fel eller ovanliga varningar. Händelseförloppet visar ett standardblockflöde: block tilldelas, repliceras, blockMap uppdateras och blocket raderas korrekt från alla noder. Inga tecken på inkonsekvens mellan DataNodes och NameNode, och raderingen följer på blocket lagts till invalidSet.",
+  "summary": "Block blk_-4334049176684001514 skrivs och repliceras framgångsrikt till flera DataNodes, blockMap uppdateras hos NameNode och blocket raderas senare från alla relevanta DataNodes som del av ett förväntat förlopp (t.ex. när filen tas bort eller transient temp-fil rensas). Inga anomalier eller fel förekommer.",
+  "events": [
+    {
+      "event_type": "Block allocation and initiating write",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1
+      ],
+      "observation": "Nytt block allokeras för skrivning.",
+      "interpretation": "Systemet påbörjar normal skrivning av block såsom väntat i en HDFS-miljö.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block replication to DataNodes",
+      "severity": "normal",
+      "supporting_log_lines": [
+        2,
+        3,
+        4
+      ],
+      "observation": "Block mottas av flera olika DataNodes.",
+      "interpretation": "Replication följer det vanliga förloppet till flera noder för redundans.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block successfully received and acknowledged",
+      "severity": "normal",
+      "supporting_log_lines": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "observation": "Block tas emot på samtliga inblandade DataNodes och PacketResponder terminerar utan problem.",
+      "interpretation": "Skrivningen och blocköverföringen har slutförts framgångsrikt och bekräftats.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "BlockMap updated for all replicas",
+      "severity": "normal",
+      "supporting_log_lines": [
+        11,
+        12,
+        13
+      ],
+      "observation": "blockMap uppdateras för blocket för samtliga relevanta DataNodes.",
+      "interpretation": "NameNode är helt synkad med DataNodes och vet var blocket finns.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block marked as invalid and scheduled for deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket läggs till invalidSet för samtliga DataNodes.",
+      "interpretation": "Blocket har markerats för radering, normalt vid t.ex. temp-filer eller efter filradering.",
+      "recommended_next_step": "Bekräfta om filradering eller temp-städning var förväntad enligt jobblogik."
+    },
+    {
+      "event_type": "Block deleted from disk",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket raderas från disk på samtliga berörda DataNodes.",
+      "interpretation": "Blocket tas bort enligt HDFS-procedur, överensstämmer med tidigare planering.",
+      "recommended_next_step": "Verifiera att motsvarande fil tas bort/logik är förväntad, annars ingen åtgärd."
+    }
+  ],
+  "unsupported_claims": []
+}

@@ -1,0 +1,72 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Flera exception-rader (SocketTimeoutException, EOFException, IOException: Connection reset by peer) förekommer i samband med blocköverföringen för samma block-ID. Dessa indikerar att blocköverföringen misslyckades eller avbröts på ett onormalt sätt. Det finns inga tecken på att blocket kunde tas emot eller hanteras korrekt efter dessa fel. Sekvensen av exception-rader och PacketResponder-terminering tyder på ett avbrutet eller misslyckat blockförlopp, vilket är avvikande för en normal HDFS-blocköverföring.",
+  "summary": "Blocköverföringen för blk_-3102267849859399193 misslyckas med flera exception-rader (SocketTimeoutException, EOFException, Connection reset by peer). Detta tyder på ett avbrutet eller felaktigt blockförlopp, vilket klassificeras som en anomali.",
+  "events": [
+    {
+      "event_type": "block_received_start",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2
+      ],
+      "observation": "Block blk_-3102267849859399193 börjar tas emot från två olika källor.",
+      "interpretation": "Blocköverföringen initieras normalt.",
+      "recommended_next_step": "Verifiera om parallella blockmottagningar är förväntat i denna konfiguration."
+    },
+    {
+      "event_type": "block_allocation",
+      "severity": "normal",
+      "supporting_log_lines": [
+        3
+      ],
+      "observation": "BLOCK* NameSystem.allocateBlock för blk_-3102267849859399193.",
+      "interpretation": "Blocket har allokerats i filsystemet, vilket är normalt.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna händelse."
+    },
+    {
+      "event_type": "writeBlock_timeout_exception",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        4
+      ],
+      "observation": "writeBlock för blk_-3102267849859399193 får SocketTimeoutException.",
+      "interpretation": "Timeout vid blockskrivning tyder på nätverksproblem eller att mottagande nod inte svarar.",
+      "recommended_next_step": "Undersök nätverksstatus och DataNode-resurser vid tidpunkten för felet."
+    },
+    {
+      "event_type": "packet_responder_termination",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        5
+      ],
+      "observation": "PacketResponder för blocket terminerar.",
+      "interpretation": "PacketResponder avslutas, vilket ofta sker vid fel eller avbruten överföring.",
+      "recommended_next_step": "Kontrollera varför PacketResponder terminerade och om det finns relaterade fel i andra loggar."
+    },
+    {
+      "event_type": "packet_responder_eof_exception",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        6
+      ],
+      "observation": "PacketResponder får EOFException för blocket.",
+      "interpretation": "EOFException indikerar att anslutningen oväntat stängdes under blocköverföringen.",
+      "recommended_next_step": "Undersök om det finns nätverksavbrott eller problem med klienten som skickade blocket."
+    },
+    {
+      "event_type": "receiveBlock_connection_reset",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        7,
+        8
+      ],
+      "observation": "Exception in receiveBlock och writeBlock received exception: Connection reset by peer.",
+      "interpretation": "Anslutningen till peer stängdes oväntat, vilket är ett tecken på misslyckad blocköverföring.",
+      "recommended_next_step": "Analysera varför peer stängde anslutningen och om det finns relaterade fel på avsändarsidan."
+    }
+  ],
+  "unsupported_claims": []
+}

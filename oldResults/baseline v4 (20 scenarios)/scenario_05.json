@@ -1,0 +1,86 @@
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots initialt lyckad blocköverföring och verifiering, förekommer ett flertal varningar om exception vid serving av blocket från samtliga lagringsnoder till många olika klienter. Därefter tas blocket bort från samtliga noder. Ingen explicit ERROR eller Exception-loggrad finns, men WARN och det mängdmässiga mönstret talar för avvikelse.",
+  "summary": "Blocket skapas, verifieras och lagras korrekt på tre noder. Därefter misslyckas ett stort antal försök att läsa ut blocket från samtliga noder, vilket indikeras av återkommande WARN om undantag vid läsning mot flera klienter. Slutligen markeras blocket som ogiltigt och tas bort från alla tre noder. Förloppet är inkonsekvent med normal HDFS-replikathantering.",
+  "events": [
+    {
+      "event_type": "Block mottagen och replikerad till tre noder",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Block blk_1717858812220360316 tas emot, lagras med rätt storlek på tre noder och syns i blockkartan.",
+      "interpretation": "Blockreplikering och initial storage fungerade som förväntat.",
+      "recommended_next_step": ""
+    },
+    {
+      "event_type": "Block verifierat flera gånger utan fel",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Verifiering av blocket lyckas vid flera tillfällen.",
+      "interpretation": "Ingen korruptionsindikator vid skriv- eller lagringstillfället.",
+      "recommended_next_step": ""
+    },
+    {
+      "event_type": "Exception vid försök att läsa blocket från alla noder till många klienter",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "WARN-upprepningar om 'Got exception while serving blk_1717858812220360316' mot samtliga replicas och olika klienter.",
+      "interpretation": "Blocket kan inte läsas ut från någon av noderna, vilket indikerar ett övergripande eller blockspecifikt problem efter lagring.",
+      "recommended_next_step": "Initiera detaljerad felsökning av blockstatus och kontrollera detaljer för exceptions på DataNode-nivå. Utred klient-, nätverks- och blockmetadata."
+    },
+    {
+      "event_type": "Block markeras som ogiltigt på samtliga noder och raderas",
+      "severity": "normal",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket läggs till i invalidSet och raderas från alla lagringsnoder.",
+      "interpretation": "Blocket tas ur bruk som konsekvens av återkommande fel/förlorad tillgänglighet.",
+      "recommended_next_step": "Verifiera varför blocket inte kunde läsas ut och om andra block påverkades samtidigt. Kontrollera loggade exceptions."
+    }
+  ],
+  "unsupported_claims": [
+    "Exakt orsak till läsfelen framgår inte av loggen (t.ex. om det är nätverks-, hårdvaru- eller datakorruptionsproblem).",
+    "Ingen direkt indikation om blocket korrupt, endast att det inte gick att läsa ut."
+  ]
+}

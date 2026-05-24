@@ -15,7 +15,7 @@ RESULTS_DIR = PROJECT_ROOT / "results" / "workflow"
 METADATA_PATH = SCENARIOS_DIR / "metadata.csv"
 
 
-SCENARIOS_TO_RUN = None #{"scenario_04", "scenario_05", "scenario_06", "scenario_07"}
+SCENARIOS_TO_RUN = None 
 
 
 def extract_json(text: str) -> dict:

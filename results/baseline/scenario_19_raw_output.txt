@@ -1,0 +1,36 @@
+```json
+{
+  "scenario_id": "scenario_19",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Block blk_6426032162622263299 genomgår ett normalt förlopp med mottagning, lagring och senare borttagning på flera noder. Enstaka varning om att blocket inte hittas vid borttagning är inte ovanligt efter tidigare lyckad radering och indikerar inte nödvändigtvis ett fel. Inga ERROR-rader eller tecken på misslyckad blockhantering i övrigt.",
+  "summary": "Blocket tas emot och lagras på flera noder, läggs till i blockkartan och tas sedan bort från samtliga noder. En varning om att blocket inte hittas vid borttagning är den enda avvikelsen, men detta är vanligt och inte tillräckligt för att klassificera scenariot som en avvikelse.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket mottas från flera källor och lagras på tre olika noder.",
+      "interpretation": "Blockreplikering och lagring fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras som ogiltigt och tas bort från samtliga noder.",
+      "interpretation": "Blocket tas bort enligt förväntat förlopp, troligen på grund av filradering eller ombalansering.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_delete_warning",
+      "severity": "warning",
+      "supporting_log_lines": [20],
+      "observation": "Varning om att blocket inte hittas vid borttagning.",
+      "interpretation": "Blocket har troligen redan tagits bort, vilket är vanligt och inte ett tecken på fel.",
+      "recommended_next_step": "Ingen åtgärd krävs om inga ytterligare problem observeras."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

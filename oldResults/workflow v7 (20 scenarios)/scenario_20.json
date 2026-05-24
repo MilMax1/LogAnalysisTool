@@ -1,0 +1,52 @@
+{
+  "scenario_id": "scenario_20",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Samtliga loggrader visar på ett förväntat blockförlopp där ett block mottas och lagras på tre noder, och därefter markeras som invalid samt tas bort från samtliga noder. Inga varningar, fel, exception eller indikationer på blockkorruption förekommer. Invalid/deletion-händelser kan uppstå i normala blocklivscykler, till exempel vid avslutad filskrivning, avbrutna jobb eller kompaktering. Inget i loggraderna pekar på avvikande eller inkonsekvent beteende.",
+  "summary": "Blocket blk_5133973138291673173 tas emot och lagras korrekt på tre datanoder. Några minuter senare markeras och raderas blocket från alla noder och deras filsystem, vilket är normalt i HDFS om blocket inte längre behövs. Det saknas varningar, error eller anomala systemrapporter.",
+  "events": [
+    {
+      "event_type": "block_received_by_datanodes",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        3,
+        4,
+        7,
+        10,
+        13,
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket mottogs korrekt tre gånger, och blockMap uppdaterades för motsvarande datanoder.",
+      "interpretation": "Blocket replicated korrekt enligt HDFS-standarden på tre repliker.",
+      "recommended_next_step": "Ingen åtgärd behövs. Bekräfta om blocket skrivits klart innan deletion."
+    },
+    {
+      "event_type": "block_invalidated_and_marked_for_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket registreras i invalidSet för samtliga tre datanoder.",
+      "interpretation": "Blocket har förmodligen blivit obsolete (t.ex. fil borttagen eller ersatt) och schemaläggs för radering.",
+      "recommended_next_step": "Ingen åtgärd behövs om filoperationerna har förväntad arbetsgång. Om möjligt, kontrollera trigger-händelsen (t.ex. om en fil togs bort eller om blocket ersattes)."
+    },
+    {
+      "event_type": "block_deleted_from_datanode_storage",
+      "severity": "normal",
+      "supporting_log_lines": [
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket tas bort från samtliga datanoders filsystem.",
+      "interpretation": "Radering av block från disk är normalt efter invalidationsprocessen och indikerar ingen anomali.",
+      "recommended_next_step": "Ingen åtgärd behövs. Möjligt att logga syftet med blockdeletion för spårbarhet (ex: manuella borttagningar eller automatiska städ-jobb)."
+    }
+  ],
+  "unsupported_claims": []
+}

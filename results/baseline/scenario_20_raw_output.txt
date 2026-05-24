@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_20",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett normalt förlopp för blockmottagning, replikering och efterföljande borttagning. Inga fel, varningar eller inkonsekvenser observeras. Blocket tas emot, lagras på tre noder och tas sedan bort på ett förväntat sätt.",
+  "summary": "Blocket blk_5133973138291673173 tas emot och replikeras till tre noder. Därefter markeras blocket som ogiltigt på samtliga noder och tas bort från filsystemet. Alla steg sker utan fel eller varningar.",
+  "events": [
+    {
+      "event_type": "Block mottagen och replikering initierad",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4],
+      "observation": "Blocket tas emot från flera källor och blockallokering sker.",
+      "interpretation": "Normalt förlopp för blockmottagning och replikering i HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Blockmottagning och lagring slutförd",
+      "severity": "normal",
+      "supporting_log_lines": [5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket tas emot, tomma paket indikerar slut på överföring, och blocket lagras på respektive nod.",
+      "interpretation": "Blocköverföringen och lagringen har slutförts korrekt.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block lagrat på samtliga noder",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "BlockMap uppdateras för samtliga tre noder.",
+      "interpretation": "Blocket är korrekt replikerat enligt HDFS-standard.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block markeras som ogiltigt och tas bort",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket läggs till invalidSet och tas bort från samtliga noder.",
+      "interpretation": "Blocket har tagits bort enligt förväntat förlopp, t.ex. efter att filen tagits bort eller ersatts.",
+      "recommended_next_step": "Ingen åtgärd krävs om borttagningen är förväntad. Om inte, kontrollera varför blocket blev ogiltigt."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

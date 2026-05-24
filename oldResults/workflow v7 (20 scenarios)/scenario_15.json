@@ -1,0 +1,61 @@
+{
+  "scenario_id": "scenario_15",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Loggraden visar att blocket mottas av flera DataNodes, lagras korrekt och därefter markeras som ogiltigt och raderas från alla noder, utan några fel, varningar eller undantag. Detta mönster stämmer med en typisk livscykel för ett temporärt block eller ett block som snabbt tas bort (t.ex. temporära filer vid MapReduce-jobb eller städning). Eftersom inga anomalier, fel eller inkonsekvenser rapporteras tyder loggarna på att systemet fungerat som väntat.",
+  "summary": "Blocket blk_-7042855855719423267 mottogs av tre DataNodes, lades till i blockkartan, markerades sedan på alla delaktiga noder som ogiltigt och togs bort. Hela förloppet sker utan någon varning, fel eller exception. Förloppet är förenligt med antingen ett temporärt block eller normal radering, och det finns inga tecken på korruption, förlorad data, nodfel eller övriga problem.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3
+      ],
+      "observation": "Blocket mottas av olika DataNodes från olika källor.",
+      "interpretation": "Blockdistribution och replication börjar som väntat, vilket är ett normalt steg i HDFS-blockhantering.",
+      "recommended_next_step": "Ingen omedelbar uppföljning behövs. Om blocket oväntat raderades, undersök varför filen/taget jobb avslutades eller togs bort."
+    },
+    {
+      "event_type": "block_stored_confirmed",
+      "severity": "normal",
+      "supporting_log_lines": [
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket lagras och blockkartan uppdateras korrekt på alla relevanta DataNodes.",
+      "interpretation": "Blocket har replikeras och konfirmerats på tre noder, vilket uppvisar förväntat beteende.",
+      "recommended_next_step": "Ingen omedelbar åtgärd; monitorera vid behov för mönster över tid."
+    },
+    {
+      "event_type": "block_invalidated_and_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket markeras som ogiltigt och läggs till invalidSet på samtliga noder.",
+      "interpretation": "Typiskt för block som förlorat sin referens eller relateras till temporära eller raderade filer. Inget i loggen tyder på ovanlighet.",
+      "recommended_next_step": "Kontrollera logik i exempelvis raderingsschema eller MapReduce-jobb om dessa block borde ha funnits kvar, annars inget att åtgärda."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket tas bort från alla underkataloger på olika DataNodes.",
+      "interpretation": "Systemet rensar bort blockdata fysiskt, som normalt efter en borttagning från HDFS.",
+      "recommended_next_step": "Verifiera att raderingen är förväntad givet systemets/företagets raderingspolicy eller temporära block."
+    }
+  ],
+  "unsupported_claims": []
+}

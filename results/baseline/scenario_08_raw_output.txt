@@ -1,0 +1,47 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots att blocket först skrivs och verifieras korrekt, uppstår ett stort antal varningar (WARN) om undantag vid försök att läsa ut blocket från flera noder. Därefter markeras blocket som ogiltigt och tas bort, men det dyker senare upp igen utan att tillhöra någon fil, vilket är inkonsekvent med ett normalt blockförlopp.",
+  "summary": "Blocket blk_3947106522258141922 skrivs och verifieras först utan problem. Senare uppstår många varningar om undantag vid försök att läsa blocket från flera noder. Blocket markeras därefter som ogiltigt och tas bort, men dyker sedan upp igen utan att tillhöra någon fil. Detta indikerar ett avvikande och inkonsekvent blockförlopp.",
+  "events": [
+    {
+      "event_type": "Block write and verification",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],
+      "observation": "Blocket tas emot, lagras och verifieras på flera noder utan fel.",
+      "interpretation": "Blocket skrivs och replikeras korrekt enligt HDFS-processen.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "Multiple exceptions during block read",
+      "severity": "anomaly",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,28,29,30,31,32],
+      "observation": "Flera WARN-rader om undantag vid försök att läsa blocket från olika noder och klienter.",
+      "interpretation": "Det finns ett utbrett problem med att läsa blocket, vilket tyder på korruption, nätverksproblem eller annan systemavvikelse.",
+      "recommended_next_step": "Undersök loggar på berörda DataNodes och klienter för detaljerade felmeddelanden. Kontrollera blockets integritet och nätverksstatus."
+    },
+    {
+      "event_type": "Block marked as invalid and deleted",
+      "severity": "warning",
+      "supporting_log_lines": [33,34,35,36,37,40],
+      "observation": "Blocket markeras som ogiltigt på flera noder och tas bort från filsystemet.",
+      "interpretation": "Systemet försöker återställa konsistens genom att ta bort ett block som inte längre anses giltigt.",
+      "recommended_next_step": "Verifiera varför blocket blev ogiltigt och om andra block påverkas. Kontrollera NameNode-loggar för ytterligare information."
+    },
+    {
+      "event_type": "Block reappears without file association",
+      "severity": "anomaly",
+      "supporting_log_lines": [38,39],
+      "observation": "Ett addStoredBlock-anrop tas emot för blocket, men det tillhör ingen fil.",
+      "interpretation": "Blocket återkommer i systemet utan att vara kopplat till någon fil, vilket är inkonsekvent och kan tyda på metadatafel eller replikationsproblem.",
+      "recommended_next_step": "Undersök blockets metadata och replikationsstatus. Kontrollera om det finns buggar eller race conditions i blockhanteringen."
+    }
+  ],
+  "unsupported_claims": [
+    "Det går inte att avgöra exakt orsak till undantagen (t.ex. nätverksfel, diskfel eller korruption) enbart utifrån dessa loggrader.",
+    "Det är inte säkert att andra block eller filer är påverkade utan ytterligare loggdata."
+  ]
+}
+```

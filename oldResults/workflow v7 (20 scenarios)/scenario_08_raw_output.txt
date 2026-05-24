@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots att blocket mottas, replikeras och verifieras som giltigt, samt att blocket därefter kan delas ut minst en gång (rad 27), följs detta av en lång sekvens där alla serve-förfrågningar mot blocket resulterar i undantag (WARN/exception, rader 17–32). Blocket markeras senare som invalid och raderas (rader 33–37). Dessutom görs ett försök att registera blocket i blockMap på en DataNode men det noteras att blocket inte längre tillhör någon fil (rad 38), vilket är ett starkt tecken på inkonsekvent blockhantering i HDFS och förekommer sällan vid normal blocklivscykel. Den totala sekvensen av händelser tyder på ett misslyckat eller skadat block och därmed är scenariot en anomali.",
+  "summary": "Blocket mottas och verifieras som giltigt, men nästan alla försök att tjäna ut blocket slutar i exception. Därefter markeras blocket som ogiltigt och raderas. Ett försök sker att lägga till blocket igen, men systemet uppger då att blocket inte tillhör någon fil. Detta är inte normal blockhantering och tyder på ett blockfel eller en anomal hantering i HDFS.",
+  "events": [
+    {
+      "event_type": "block_received_and_verified",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 9, 10, 12, 13, 14, 15, 16],
+      "observation": "Blocket blk_3947106522258141922 mottas, replikeras på flera noder och verifieras flera gånger som giltigt.",
+      "interpretation": "Initial blocköverföring och validering lyckas. Detta är förväntat i normal drift.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "repeated_exceptions_while_serving_block",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Många serve-förfrågningar mot blocket leder till undantag (Got exception while serving ...).",
+      "interpretation": "Hög mängd serve-exceptions tyder på att blocket inte kan läsas korrekt eller att det finns kommunikations-/integritetsproblem.",
+      "recommended_next_step": "Undersök datanodernas loggar, nätverksstatus och eventuella blockkorruption; kontrollera även varför exceptions uppstår så frekvent vid serving."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 40],
+      "observation": "Blocket markeras som invalid och tas bort från flera datanoder.",
+      "interpretation": "Blocket anses inte längre vara giltigt och raderas. Detta är inte förväntat för ett block som nyss verifierats, om ingen användar- eller systeminitierad borttagning har skett.",
+      "recommended_next_step": "Utred varför blocket ogiltigförklaras. Kontrollera HDFS-journal och klientloggar för att förstå initiativ till blockinvaliditet eller radering."
+    },
+    {
+      "event_type": "addStoredBlock_request_for_block_not_belonging_to_any_file",
+      "severity": "anomaly",
+      "supporting_log_lines": [38],
+      "observation": "addStoredBlock request för blocket - blocket associeras inte längre med någon fil.",
+      "interpretation": "HDFS uppger att blocket inte tillhör någon fil. Detta tyder på att filsystemets metadata är inkonsekvent.",
+      "recommended_next_step": "Kör HDFS fsck och kontrollera konsistens på filsystemsnivå. Diagnostisera namnrymd/metadata-relaterade fel."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

@@ -1,0 +1,28 @@
+```json
+{
+  "scenario_id": "scenario_11",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett normalt förlopp för blockmottagning, replikering och efterföljande borttagning. Inga fel, varningar eller inkonsekventa händelser observeras. Blocket tas emot, lagras på flera noder och tas sedan bort på ett koordinerat sätt.",
+  "summary": "Blocket blk_4237356440788557206 tas emot och replikeras korrekt till flera datanoder. Efter en tid markeras blocket som ogiltigt på samtliga noder och tas bort från filsystemet. Alla steg sker utan fel eller varningar.",
+  "events": [
+    {
+      "event_type": "block_receive_and_replication",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket tas emot från flera källor och replikeras till tre datanoder. BlockMap uppdateras för samtliga noder.",
+      "interpretation": "Blocket har skrivits och replikerats enligt HDFS standardförlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras som ogiltigt på samtliga noder och tas bort från filsystemet.",
+      "interpretation": "Blocket har blivit ogiltigt, troligen på grund av filradering eller ombalansering, och tas bort enligt förväntat förlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs om blockradering är förväntad. Om inte, kontrollera varför blocket blev ogiltigt."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

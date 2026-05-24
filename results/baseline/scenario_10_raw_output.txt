@@ -1,0 +1,47 @@
+```json
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Flera logghändelser visar återkommande undantag (SocketTimeoutException, EOFException, IOException: Connection reset by peer) under blocköverföring, vilket tyder på att blocket inte kunde skrivas eller överföras korrekt. Händelserna är konsekventa och återkommande för samma block, vilket indikerar ett misslyckat blockförlopp snarare än enstaka fel.",
+  "summary": "Blocköverföringen för blk_-3102267849859399193 misslyckas upprepade gånger med olika undantag relaterade till nätverksproblem och anslutningsavbrott. Detta tyder på ett avvikande förlopp för blockhanteringen.",
+  "events": [
+    {
+      "event_type": "Block allocation",
+      "severity": "normal",
+      "supporting_log_lines": [3],
+      "observation": "Block blk_-3102267849859399193 allokeras för filen /user/root/rand/_temporary/_task_200811092030_0001_m_000249_0/part-00249.",
+      "interpretation": "Blockallokeringen sker som förväntat utan fel.",
+      "recommended_next_step": "Ingen åtgärd krävs för blockallokeringen."
+    },
+    {
+      "event_type": "Block write exception (SocketTimeoutException)",
+      "severity": "anomaly",
+      "supporting_log_lines": [4],
+      "observation": "writeBlock för blk_-3102267849859399193 får undantaget java.net.SocketTimeoutException.",
+      "interpretation": "Timeout vid blockskrivning tyder på nätverksproblem eller prestandaproblem i DataNode.",
+      "recommended_next_step": "Undersök nätverkslatens och DataNode-prestanda för att identifiera orsaken till timeout."
+    },
+    {
+      "event_type": "PacketResponder termination with exception (EOFException)",
+      "severity": "anomaly",
+      "supporting_log_lines": [5, 6],
+      "observation": "PacketResponder för blk_-3102267849859399193 terminerar och får java.io.EOFException.",
+      "interpretation": "EOFException vid blocköverföring indikerar att anslutningen oväntat stängdes.",
+      "recommended_next_step": "Kontrollera nätverksstabilitet och eventuella avbrott mellan klient och DataNode."
+    },
+    {
+      "event_type": "Block receive exception (Connection reset by peer)",
+      "severity": "anomaly",
+      "supporting_log_lines": [7, 8],
+      "observation": "receiveBlock och writeBlock för blk_-3102267849859399193 får java.io.IOException: Connection reset by peer.",
+      "interpretation": "Anslutningen till peer stängdes oväntat under blocköverföringen, vilket tyder på nätverksproblem eller att klienten avbröt överföringen.",
+      "recommended_next_step": "Granska nätverksloggar och klientloggar för att identifiera varför anslutningen stängdes."
+    }
+  ],
+  "unsupported_claims": [
+    "Det går inte att avgöra om felet beror på en specifik nätverkskomponent eller på klienten utan ytterligare loggar.",
+    "Det finns inget explicit ERROR-loggmeddelande, men återkommande undantag och avbrutna anslutningar indikerar ändå ett misslyckat blockförlopp."
+  ]
+}
+```

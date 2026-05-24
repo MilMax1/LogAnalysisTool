@@ -1,0 +1,28 @@
+```json
+{
+  "scenario_id": "scenario_14",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Alla loggrader visar ett regelrätt flöde där ett block tas emot av flera datanoder, läggs till i blockkartan, och sedermera raderas från samtliga noder via invalidSet och faktiska delete-operationer. Frånvaron av ERROR, WARN, exception, failure, eller corruption samt avsaknaden av andra diagnostiskt viktiga avvikande templates stödjer tolkningen att scenariot är en normal del av blocklivscykeln, exempelvis som när ett block tas bort som inte längre behövs eller tillhör en raderad fil.",
+  "summary": "Blocket mottas, registreras och lagras korrekt på tre noder. Senare markeras blocket som ogiltigt ('invalidSet') och tas bort från alla tre noder, utan att några felmeddelanden, varningar eller korruptionsindikationer förekommer. Detta är typiskt för en förväntad blockradering, till exempel när en fil raderas eller ombalanseras i HDFS.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 6, 7, 9, 11, 12, 13],
+      "observation": "Blocket blk_709268592365361671 mottas av tre datanoder och bekräftad lagrad på samtliga noder.",
+      "interpretation": "Inga tecken på anomalier eller problem vid mottagandet av blocket. Normal blockdistribuering och lagring.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidated_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket blk_709268592365361671 markeras som ogiltigt ('invalidSet') och tas bort på samtliga tre noder.",
+      "interpretation": "Blockets radering sker koordinerat och utan varnings- eller felmeddelanden, vilket är normalt då block inte längre behövs, t.ex. efter en filradering eller under ombalansering.",
+      "recommended_next_step": "Ingen vidare felsökning behövs om blockraderingen är förväntad (t.ex. pga. filradering). Om blockraderingen inte är förväntad, kontrollera varför blocket blivit ogiltigt i filsystemets metadataloggar."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

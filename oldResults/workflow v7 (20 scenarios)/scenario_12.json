@@ -1,0 +1,43 @@
+{
+  "scenario_id": "scenario_12",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Loggsekvensen visar ett block som tas emot och lagras på flera noder utan några fel-, varnings- eller exception-händelser. Därefter markeras blocket som invalid och raderas från alla noder, vilket är en del av normal blocklivscykel i HDFS – till exempel vid lyckad hantering av kortlivade temporära filer eller avstädning efter 'delete'. Alla åtgärder sker på INFO-nivå och utan tecken på fel, korruption, eller oväntade misslyckanden.",
+  "summary": "Blocket blk_5668708402864483965 mottas och lagras korrekt på tre datanoder. Senare markeras det som 'invalid' och raderas från dessa noder, troligen som resultat av en filradering eller avstädning. Inga indikationer på fel, varning, korruption eller inkonsekvenser syns i loggarna. Sekvensen överensstämmer med normala HDFS-operationer kring block- och filhantering.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13
+      ],
+      "observation": "Blocket mottas och bekräftas hos tre olika noder, och lagringen rapporteras till NameNode.",
+      "interpretation": "Inträffar enligt normala skriv- och replikationsförlopp för HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs – blockmottagning och replikeringsprocessen ser korrekt ut."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket markeras som 'invalid' på alla tre noder och raderas därefter från deras lokala datalagring.",
+      "interpretation": "Detta är normalt exempelvis efter en filradering eller städning när blocket inte längre behövs.",
+      "recommended_next_step": "Om detta motsvarar användarens eller applikationens intention (t.ex. filradering eller temporär fil), krävs ingen åtgärd. Om blocket oväntat markeras som invalid, verifiera anropslogik till delete/cleanup mot filsystemet."
+    }
+  ],
+  "unsupported_claims": []
+}

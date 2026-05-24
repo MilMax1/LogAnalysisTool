@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_14",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Hela blockförloppet sker med endast INFO-rader, utan några tecken på fel, varning eller misslyckade operationer. Att blocket senare raderas och markeras som invalid är ett normalt förekommande scenario i HDFS och föregås inte av några fel eller inkonsekvenser i loggarna.",
+  "summary": "Block blk_709268592365361671 tas emot, lagras på flera noder och raderas senare på ett kontrollerat sätt. Alla loggrader är INFO och inga felindikatorer förekommer.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tas emot av flera DataNodes och blockMap uppdateras utan fel.",
+      "interpretation": "Blocket har framgångsrikt replikerats och lagrats enligt förväntat HDFS-flöde.",
+      "recommended_next_step": "Ingen åtgärd behövs, scenario normalt."
+    },
+    {
+      "event_type": "block_marked_invalid_and_scheduled_for_delete",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket markeras som invalid på samtliga berörda DataNodes, vilket är en förberedelse för radering.",
+      "interpretation": "Att ett block markeras som invalid indikerar normalt att blocket inte längre behövs, exempelvis för temporära eller överflödiga block.",
+      "recommended_next_step": "Validera att det motsvarar en förväntad rensning, annars ingen åtgärd."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blockfilerna raderas från samtliga noder där blocket lagrats.",
+      "interpretation": "Raderingen sker kontrollerat och utan några loggrader om fel eller problem.",
+      "recommended_next_step": "Ingen vidare felsökning krävs."
+    }
+  ],
+  "unsupported_claims": []
+}

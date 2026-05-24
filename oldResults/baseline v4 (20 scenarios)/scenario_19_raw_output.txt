@@ -1,0 +1,39 @@
+```json
+{
+  "scenario_id": "scenario_19",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Loggen visar inledningsvis normala blockmottagningar och lagring på flera datanoder, med korrekta blockMap-uppdateringar. Dock följs detta snabbt av att blocket tas bort från samtliga datanoder och slutligen av ett felmeddelande (WARN) om att blocket inte kan hittas vid borttagning. Helheten indikerar ett avvikande förlopp för blockhantering trots att ingen explicit ERROR-logg förekommer.",
+  "summary": "Ett block överförs, mottas och lagras hos tre noder, men snart därefter tas blocket bort från alla noder och försök att slutföra borttagning ger en varning om utebliven blockinfo. Detta visar på onormal blockhantering och möjlig inkonsistens.",
+  "events": [
+    {
+      "event_type": "Block mottas och lagras korrekt",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+      "observation": "Blocket blk_6426032162622263299 tas emot och lagras på tre datanoder, blockMap uppdateras.",
+      "interpretation": "Händelseförloppet är normalt fram till denna punkt, där block skrivs och bekräftas på tre replikerade noder enligt standardprocedur i HDFS.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för detta event."
+    },
+    {
+      "event_type": "Block becomes invalid och tas bort från samtliga noder",
+      "severity": "anomaly",
+      "supporting_log_lines": [14,15,16],
+      "observation": "Blocket läggs till invalidSet på samtliga tre noder omedelbart efter lagring.",
+      "interpretation": "Det är ovanligt att ett nytt block omedelbart blir ogiltigt på samtliga repliker utan någon synlig orsak, vilket indikerar en möjlig systeminkonsistens eller applikationsproblem.",
+      "recommended_next_step": "Utred varför blocket markerats ogiltigt så kort efter framgångsrik replikering; kontrollera eventuella samtidiga jobbfel, användarinteraktion eller policyer."
+    },
+    {
+      "event_type": "Misslyckad blockdeletion",
+      "severity": "warning",
+      "supporting_log_lines": [20],
+      "observation": "WARN-logg indikerar att blockinformationen saknas vid borttagning.",
+      "interpretation": "Potentiell inkonsistens i blockmetadata; blocket hade eventuellt redan tagits bort, eller det finns problem med volymkartan.",
+      "recommended_next_step": "Kontrollera kompletterande logs för eventuella metadatafel och verifiera status på blockMap och volymkartorna för att minimera risk för datakorruption."
+    }
+  ],
+  "unsupported_claims": [
+    "Orsak till att blocket blev ogiltigt (t.ex. jobbavbrott, node failure eller policy) framgår ej av loggraderna.",
+    "Förekomst av dataförlust kan inte fastställas säkert enbart utifrån denna logg."
+  ]
+}
+```

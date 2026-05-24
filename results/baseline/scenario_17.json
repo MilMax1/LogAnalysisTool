@@ -1,0 +1,57 @@
+{
+  "scenario_id": "scenario_17",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Block mottas och lagras korrekt på flera noder, blockMap uppdateras, och blocket tas sedan bort från alla noder. Enstaka WARN-rad om saknad BlockInfo vid borttagning, men detta är inte tillräckligt för att klassificera scenariot som en avvikelse då blocket redan är markerat för borttagning på alla noder.",
+  "summary": "Blocket blk_6331191059322192725 tas emot och lagras på tre noder. BlockMap uppdateras korrekt. Blocket markeras senare som ogiltigt och tas bort från samtliga noder. En varning uppstår vid borttagning på grund av att blocket inte hittas i volumeMap, men detta påverkar inte helhetsförloppet.",
+  "events": [
+    {
+      "event_type": "Block mottagen och lagrad på flera noder",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tas emot från flera källor och lagras på tre olika noder. BlockMap uppdateras för samtliga noder.",
+      "interpretation": "Blockreplikering och lagring fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block markeras som ogiltigt och tas bort",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        19,
+        20
+      ],
+      "observation": "Blocket läggs till invalidSet på samtliga noder och tas bort från filsystemet.",
+      "interpretation": "Blocket har blivit ogiltigt, troligen på grund av filslut eller ombalansering, och tas bort enligt förväntat förlopp.",
+      "recommended_next_step": "Verifiera att blocket inte längre refereras av någon fil om det är relevant."
+    },
+    {
+      "event_type": "Varning vid borttagning av block",
+      "severity": "warning",
+      "supporting_log_lines": [
+        18
+      ],
+      "observation": "WARN: BlockInfo not found in volumeMap vid försök att ta bort blocket.",
+      "interpretation": "Blocket kan redan ha tagits bort eller saknas i metadata, vilket är vanligt vid parallella borttagningsförsök.",
+      "recommended_next_step": "Ingen åtgärd krävs om inga ytterligare fel uppstår. Om detta återkommer ofta, kontrollera synkronisering mellan metadata och datalagring."
+    }
+  ],
+  "unsupported_claims": []
+}

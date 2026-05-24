@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är av typen INFO och indikerar normala händelseförlopp för blockskrivning, verifiering, och efterföljande radering utan tecken på fel eller inkonsekvenser. Blocket skrivs, verifieras som lyckat, och tas så småningom bort i enlighet med vanlig HDFS-logik.",
+  "summary": "Block blk_7503483334202473044 skrivs till klustret från flera noder, verifieras framgångsrikt och tas slutligen bort. Inga anomalier, fel eller inkonsekvenser observerades.",
+  "events": [
+    {
+      "event_type": "block_receive",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4],
+      "observation": "Block mottas från flera källnoder.",
+      "interpretation": "Normal del av blockskriveprocessen för replikering i HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_successful_write",
+      "severity": "normal",
+      "supporting_log_lines": [3, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket skrivs och lagras på samtliga noder, blockkartan uppdateras.",
+      "interpretation": "Skriven och replikerad blockhantering genomförs korrekt.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [15, 16],
+      "observation": "Blockverifiering lyckas två gånger.",
+      "interpretation": "Block lagrats korrekt och är integritetskontrollerat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket markerat för borttagning och tas bort från noder.",
+      "interpretation": "Normal radering av block, troligen som del av filborttagning eller utfasning.",
+      "recommended_next_step": "Verifiera att blockraderingen motsvarar väntade livscykelhändelser om så önskas, annars ingen åtgärd."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

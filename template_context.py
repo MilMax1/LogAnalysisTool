@@ -27,7 +27,7 @@ NOTABLE_TEMPLATE_IDS = {
     "E29": "PendingReplicationMonitor timed out block",
 }
 
-# relevanta men inte 100% = anomaly
+
 COMMON_WARNING_TEMPLATE_IDS = {
     "E4": "Got exception while serving block",
 }
@@ -151,9 +151,6 @@ def build_template_summary(block_id: str, max_events: int = 30) -> dict[str, Any
 
 
 def build_template_context(block_id: str, max_events: int = 30) -> str:
-    """
-    Bygger text som kan läggas in i workflowets structured context.
-    """
     summary = build_template_summary(block_id, max_events=max_events)
 
     lines = [

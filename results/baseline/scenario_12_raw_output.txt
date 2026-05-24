@@ -1,0 +1,28 @@
+```json
+{
+  "scenario_id": "scenario_12",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett konsekvent förlopp där ett block tas emot, lagras på flera noder, och därefter tas bort från systemet. Det finns inga tecken på fel, varningar eller inkonsekvenser i blockhanteringen.",
+  "summary": "Blocket blk_5668708402864483965 tas emot och lagras korrekt på tre noder. Senare markeras blocket som ogiltigt och tas bort från samtliga noder, vilket är ett normalt förlopp exempelvis vid temporära filer eller avbrutna jobb.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket mottas från flera källor och lagras på tre olika datanoder.",
+      "interpretation": "Blockreplikering och lagring fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras som ogiltigt på samtliga noder och tas bort från disksystemet.",
+      "interpretation": "Blocket har sannolikt blivit överflödigt, t.ex. på grund av att en temporär fil eller ett jobb avslutats.",
+      "recommended_next_step": "Ingen åtgärd krävs om blocket tillhör en temporär eller borttagen fil. Om blocket förväntas vara kvar, kontrollera varför det markerades som ogiltigt."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Trots förekomsten av flera WARN- och exception-rader vid block-serving, visar loggarna ett normalt blocklivscykelförlopp: blocket tas emot, lagras, verifieras framgångsrikt och raderas slutligen på ett kontrollerat sätt. Inga ERROR- eller korruptionsmeddelanden förekommer. Exception-rader vid serving är vanliga i HDFS och leder inte automatiskt till anomali, särskilt när blocket verifieras och raderas enligt förväntat mönster.",
+  "summary": "Blocket blk_1717858812220360316 mottas, lagras och verifieras utan fel. Flera exception-rader uppstår vid försök att serva blocket, men dessa följs av att blocket markeras som invalid och raderas på samtliga noder. Inga tecken på datakorruption eller systemfel förekommer. Händelseförloppet är förenligt med normal blockhantering i HDFS, där block ibland tas bort efter att ha blivit otillgängliga eller överflödiga.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket mottas från flera källor och lagras på tre olika datanoder.",
+      "interpretation": "Blocket distribueras och lagras enligt HDFS-replikationsprinciper.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockmottagning och lagring är normal."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras framgångsrikt på samtliga noder.",
+      "interpretation": "Ingen datakorruption upptäcks; blocket är intakt.",
+      "recommended_next_step": "Ingen åtgärd krävs; verifieringen är lyckad."
+    },
+    {
+      "event_type": "block_serving_exceptions",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Flera WARN-rader om exception vid försök att serva blocket till olika klienter.",
+      "interpretation": "Det uppstår problem vid block-serving, vilket är vanligt i HDFS och kan bero på klientavbrott, nätverksproblem eller att blocket redan är markerat för borttagning. Eftersom blocket verifierats och inga fel eller korruptionsmeddelanden finns, tyder detta inte på en anomali.",
+      "recommended_next_step": "Om dessa exceptions är återkommande för många block, undersök nätverksstabilitet och klientloggar. För enstaka block krävs ingen åtgärd."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket markeras som invalid och raderas på samtliga noder.",
+      "interpretation": "Blocket tas bort enligt normal HDFS-livscykel, troligen efter att det blivit överflödigt eller otillgängligt för klienter.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockradering är normal när blocket inte längre behövs eller är otillgängligt."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

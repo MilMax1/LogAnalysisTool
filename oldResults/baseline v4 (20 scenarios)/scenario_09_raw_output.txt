@@ -1,0 +1,55 @@
+```json
+{
+  "scenario_id": "scenario_09",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Scenariot börjar med normala blockmottagnings- och valideringsflöden, men därefter sker upprepade undantag (WARN) vid försök att servera blocket från flera noder, vilket antyder problem med tillgänglighet eller korruption. Slutligen flaggas blocket som ogiltigt och tas bort, där det även uppstår ett oväntat fel vid borttagning. Helheten visar på ett misslyckat blockförlopp trots avsaknad av ERROR-rader.",
+  "summary": "Block blk_7956543127401791181 mottas, repliker och valideras initialt på flera DataNodes. Därefter sker upprepade undantag (WARN) när blocket ska servas till klienter, vilket indikerar att blocket blivit korrupt eller otillgängligt. Blocket hamnar i invalidSet och försöks tas bort. Ett oväntat fel uppstår även vid borttagning på en nod, vilket bekräftar ett avvikande förlopp.",
+  "events": [
+    {
+      "event_type": "Block reception and replication",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 7, 8, 9, 11, 13],
+      "observation": "Blocket tas emot, repliker och läggs till blockkartan på tre noder.",
+      "interpretation": "Blockmottagning och initial blockhantering är normal.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del av förloppet."
+    },
+    {
+      "event_type": "Block verification succeeded",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras framgångsrikt flera gånger.",
+      "interpretation": "Blocket var initialt korrekt och oförändrat på lagringsplatsen.",
+      "recommended_next_step": "Ingen omedelbar åtgärd."
+    },
+    {
+      "event_type": "Exceptions serving block",
+      "severity": "warning",
+      "supporting_log_lines": [17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+      "observation": "Upprepade WARN-undantag vid försök att serva blocket från samtliga berörda lagringsnoder.",
+      "interpretation": "Blocket är korrupt eller otillgängligt för klienter på flera DataNodes, eventuellt pga. synkroniserings- eller lagringsproblem.",
+      "recommended_next_step": "Verifiera loggar på DataNodes för mer detaljer om undantagen och undersök blockstatus samt nätverks- och diskproblem."
+    },
+    {
+      "event_type": "Block marked invalid and deleted",
+      "severity": "warning",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 39],
+      "observation": "Blocket läggs till invalidSet och raderas därefter från flera noder.",
+      "interpretation": "Blocket anses vara oanvändbart och tas bort enligt HDFS-protokoll.",
+      "recommended_next_step": "Följ upp vad som ledde till blockets invalid-tillstånd och om liknande mönster gäller för andra block."
+    },
+    {
+      "event_type": "Unexpected error during block deletion",
+      "severity": "warning",
+      "supporting_log_lines": [38],
+      "observation": "WARN: Ov�ntat fel, BlockInfo saknas i volumeMap vid borttagning av block.",
+      "interpretation": "State eller metadata för blocket är inkonsekvent, vilket stärker anomalisk bedömning.",
+      "recommended_next_step": "Undersök HDFS-metadata på berörd nod, kontrollera disk och volumeMap-operationer."
+    }
+  ],
+  "unsupported_claims": [
+    "Det är inte explicit visat varför blocket blev korrupt eller otillgängligt (t.ex. nätverk, disk eller buggar).",
+    "Ingen direkt loggrad visar på faktisk blockkorruption eller fysisk diskskada."
+  ]
+}
+```

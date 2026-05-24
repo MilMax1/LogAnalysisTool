@@ -1,0 +1,47 @@
+{
+  "scenario_id": "scenario_14",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett normalt förlopp för blockmottagning, lagring och senare borttagning. Inga varningar eller felmeddelanden förekommer. Att blocket läggs till invalidSet och tas bort är normalt vid exempelvis temporära filer eller om blocket inte längre behövs.",
+  "summary": "Blocket blk_709268592365361671 tas emot och lagras på flera noder, läggs senare till invalidSet och tas bort från filsystemet. Inga tecken på fel eller avvikande beteende.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tas emot från flera källor och lagras på tre olika noder.",
+      "interpretation": "Blockreplikering och lagring fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket läggs till invalidSet på samtliga noder och tas bort från filsystemet.",
+      "interpretation": "Blocket är inte längre giltigt, troligen på grund av filradering eller temporär filhantering.",
+      "recommended_next_step": "Ingen åtgärd krävs om detta motsvarar förväntad filhantering."
+    }
+  ],
+  "unsupported_claims": []
+}

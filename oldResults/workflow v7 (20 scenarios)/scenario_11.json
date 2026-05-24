@@ -1,0 +1,52 @@
+{
+  "scenario_id": "scenario_11",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggförloppet visar mottagande och lagring av ett block hos flera datanoder, följt av att blocket markeras som ogiltigt (invalid) och raderas från datanoderna. Ingen varning, exception eller error förekommer. Denna sekvens motsvarar en typisk, förväntad blocklivscykel – till exempel på grund av att en fil tas bort eller omskrivs. Alla steg är logiskt sekventiella utan tecken på fel eller datakorruption.",
+  "summary": "Block blk_4237356440788557206 mottas, lagras och sprids till tre datanoder. Blocket markeras senare som ogiltigt och raderas från alla datanoder, utan fel eller varningsmeddelanden. Detta förlopp är förenligt med normal hantering i HDFS efter till exempel en filradering.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket blk_4237356440788557206 tas emot och lagras av datanoder 10.251.65.203, 10.251.111.80 och 10.251.214.175.",
+      "interpretation": "Blockreplikering och lagring är framgångsrik hos samtliga noder. Inga avbrott eller fel observeras i denna fas.",
+      "recommended_next_step": "Ingen åtgärd krävs. Kontrollera ev. filsystemoperationer om ovanlig blockborttagning misstänks."
+    },
+    {
+      "event_type": "block_marked_invalid",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket blk_4237356440788557206 markeras som ogiltigt (invalid) på alla tre datanoder i invalidSet.",
+      "interpretation": "Blocket kopplas inte längre till någon giltig fil (t.ex. efter fil- eller blockradering), vilket är normalt i blocklivscykeln.",
+      "recommended_next_step": "Ingen åtgärd krävs om detta motsvarar normal radering. Om oväntat, verifiera användar- eller systeminitiativ för block-/filradering."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket raderas fysiskt från datanodernas disk efter att ha markerats som invalid.",
+      "interpretation": "Normalt steg i blockets avslutade livscykel. Ingen indikation på felaktig eller inkonsekvent radering.",
+      "recommended_next_step": "Ingen åtgärd krävs. Om problem misstänks, kontrollera varför blocket raderades (t.ex. filborttagning, manuella åtgärder eller policybetingad borttagning)."
+    }
+  ],
+  "unsupported_claims": []
+}

@@ -1,0 +1,57 @@
+{
+  "scenario_id": "scenario_19",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Händelseförloppet visar ett i övrigt normalt blockflöde (block-mottagning, lagring, invalid-markering och radering), men avslutas med en varning vid försök att radera blocket: \"Unexpected error trying to delete block ... BlockInfo not found in volumeMap.\" (rad 20). Sådan varning indikerar att blockinformationen saknas där den borde finnas, vilket avviker från ett helt normalt förlopp och är allmänt betraktad som potentiellt anomal vid HDFS-blockhantering. Inga andra fel eller exception visas, men den ovanliga slutloggen tyder på ett inkonsekvent tillstånd efter blockets livscykel och kräver vidare utredning.",
+  "summary": "Blocket mottas, lagras och markeras för radering på flera datanoder på ett förväntat sätt, men försök att radera blocket från lagringsstrukturen misslyckas delvis, vilket resulterar i att BlockInfo saknas i volumeMap. Detta är en välkänd men onormal situation i HDFS och bör kontrolleras.",
+  "events": [
+    {
+      "event_type": "block_receive_and_storage",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas på flera noder, lagras och blockMap uppdateras i NameSystem för tre datanoder.",
+      "interpretation": "Händelseförloppet är konsistent med normalt mottagande och lagring av ett HDFS-block på replikerade noder.",
+      "recommended_next_step": "Ingen ytterligare åtgärd för blockmottagning krävs."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) på samtliga noder och radering påbörjas på flera fysiska sökvägar.",
+      "interpretation": "Normalt när en blockreplik inte längre behövs ska den tas bort från disk, och loggen visar en sådan korrekt initiering.",
+      "recommended_next_step": "Verifiera att blockets metadata faktiskt rensas från systemet."
+    },
+    {
+      "event_type": "block_delete_error_blockinfo_missing",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        20
+      ],
+      "observation": "\"Unexpected error trying to delete block blk_6426032162622263299. BlockInfo not found in volumeMap.\"",
+      "interpretation": "HDFS väntade sig att hitta metadata (BlockInfo) för blocket vid radering, men denna fanns inte. Det kan indikera att metainformation om blocket har blivit inkonsekvent – ett känt men inte normalt tillstånd, ofta orsakad av race conditions, tidigare fel eller metadata-korruption.",
+      "recommended_next_step": "Undersök blockreplica-status för denna datanod, kontrollera NameNode-loggar kring tiden för blockraderingen för ytterligare fel eller race-condition-indikationer. Kör fsck för att identifiera eventuella kvarvarande problem med blocket och säkerställ att volumeMap är konsistent. Om fallet upprepar sig – kontrollera version/mjukvarubuggfixar."
+    }
+  ],
+  "unsupported_claims": [
+    "Att denna varning alltid innebär faktisk korruption eller dataförlust – det är endast en indikator på inkonsekvens och behöver ytterligare analys för verifiering.",
+    "Exakt orsak till att BlockInfo saknades (kan bero på tidigare fullständigt lyckad radering, race condition, eller annan intern hantering – loggarna ger inte entydigt svar).",
+    "Att andra, icke-nämnda block i systemet påverkas – endast blocket i fråga (blk_6426032162622263299) omfattas av observationen."
+  ]
+}

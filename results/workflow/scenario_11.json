@@ -1,0 +1,52 @@
+{
+  "scenario_id": "scenario_11",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggsekvensen visar ett komplett och konsistent blockförlopp: blocket tas emot av flera datanoder, lagras korrekt och raderas därefter från samtliga noder utan några fel, varningar eller oväntade undantag. Alla deletion- och invalid-rader följer på blockmottagning och lagring, vilket är normalt vid exempelvis temporära filer eller när block inte längre behövs. Inga tecken på korruption, misslyckad replikering eller oväntade fel förekommer.",
+  "summary": "Blocket blk_4237356440788557206 tas emot och lagras på flera datanoder, markeras senare som ogiltigt och raderas från samtliga noder. Förloppet är sekventiellt och utan fel eller varningar, vilket tyder på en normal blocklivscykel, exempelvis för temporära eller borttagna filer.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas och lagras på flera datanoder (10.251.65.203, 10.251.111.80, 10.251.214.175) och blockMap uppdateras.",
+      "interpretation": "Blocket har replikerats och lagrats korrekt på förväntade noder.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockmottagning och lagring är normal."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) på samtliga noder.",
+      "interpretation": "Blocket är inte längre giltigt, troligen på grund av filradering eller att det är temporärt.",
+      "recommended_next_step": "Ingen åtgärd krävs om blocket tillhör en temporär eller borttagen fil."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket raderas från samtliga noder och tillhörande filer tas bort.",
+      "interpretation": "Blocket har tagits bort från systemet enligt förväntad process.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockradering är normal när blocket inte längre behövs."
+    }
+  ],
+  "unsupported_claims": []
+}

@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_01",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Hela blockförloppet (skrivning, replikering, leverans till klienter och radering) följer ett normalt mönster enligt loggen. Blocket skapas, replikeras till många DataNodes, levereras till diverse klienter och tas därefter bort (delete/invalid) i slutet – vilket är normalt för tillfälliga filer, exempelvis tillhörande mapreduce-jobb, temporära filer eller filer som raderas av användaren. Inga ERROR- eller varningsrader förekommer. Även delete och invalidSet-entry är INTE anomalier i sig utan förväntade händelser i HDFS.",
+  "summary": "Blocket blk_-1608999687919862906 tas emot, skrivs och replikeras ut till ett stort antal DataNodes med korrekt rapportering av blockMap-uppdateringar. Blocket levereras till många klienter och därefter raderas blocket från samtliga noder, vilket är förväntat beteende och indikerar en lyckad hantering och cleaning av blocket vid exempelvis job-slut.",
+  "events": [
+    {
+      "event_type": "block_receipt_and_allocation",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4],
+      "observation": "Blocket tas emot på flera DataNodes och allokeras av NameNode.",
+      "interpretation": "Starten av blockförloppet är normal, där blocket kopieras ut till avsedda datanoder.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_replication_and_map_update",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13, 21, 22, 31, 32, 65, 66, 163],
+      "observation": "blockMap uppdateras konsekvent för varje replikat och blocket sprids och syns på flera DataNodes.",
+      "interpretation": "Replikeringen och block-hanteringen fungerar enligt HDFS-design.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_serving",
+      "severity": "normal",
+      "supporting_log_lines": [23, 37, 38, 39, 44, 45, 50, 51, 52, 58, 62, 67, 71, 88, 90, 130, 150, 153, 163, 197, 203, 220, 230, 240, 246],
+      "observation": "Många DataNodes levererar blocket till olika klienter, vilket indikeras av ett stort antal 'Served block'-loggar.",
+      "interpretation": "Blocket används aktivt och distribueras till klienter efter replikering, vilket är önskat HDFS-beteende.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_deletion_and_invalidation",
+      "severity": "normal",
+      "supporting_log_lines": [250, 251, 252, 258, 259, 260, 261, 269],
+      "observation": "Blocket markeras för radering (invalidSet) och tas bort från alla DataNodes.",
+      "interpretation": "Blocket tas bort på samtliga noder på korrekt sätt. Ingen indikation på oegentligheter eller fel – delete/invalid är vanligt efter slutfört jobb eller filborttag.",
+      "recommended_next_step": "Ingen åtgärd krävs om inte borttag var oväntad. Om raderingen var oförväntad, kontrollera överliggande filsystem-operationer."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

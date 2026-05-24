@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_15",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggarna visar ett normalt förlopp där ett block tas emot av flera DataNodes, registreras i blockkartan, och därefter valideras och tas bort från alla noder. Det finns inga WARN, ERROR eller tydligt inkonsekventa händelser som tyder på fel.",
+  "summary": "Block blk_-7042855855719423267 tas emot, skrivs, och valideras av flera DataNodes. Senare tas blocket bort på ett kontrollerat sätt från samtliga noder och blockkartan uppdateras. Inga tecken på avvikelser eller misslyckad hantering.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3],
+      "observation": "DataNodes tar emot blocket från olika källor.",
+      "interpretation": "Blocket replikerats mellan noder enligt normal procedur.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_written_confirmed",
+      "severity": "normal",
+      "supporting_log_lines": [5, 6, 7, 8, 9, 10],
+      "observation": "Samtliga PacketResponders avslutas, blocket är mottaget med korrekt storlek på noderna.",
+      "interpretation": "Blocket har skrivits och bekräftats på respektive datanod.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "blockmap_updated",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blockkartan uppdateras för samtliga noder med blockets data.",
+      "interpretation": "Blocstatus rapporteras in till NameNode, inget tyder på inkonsekvenser.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_marked_invalid",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket markeras som ogiltigt/inte längre behövt på samtliga DataNodes.",
+      "interpretation": "Trolig rensning enligt schema eller filborttagning, inget avvikande mönster.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19],
+      "observation": "Blocket raderas från lagringen på samtliga DataNodes.",
+      "interpretation": "Blocket tas bort som väntat efter rensningsbeslut, speglar ovanstående invalid-markering.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

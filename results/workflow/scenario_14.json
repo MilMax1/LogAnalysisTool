@@ -1,0 +1,52 @@
+{
+  "scenario_id": "scenario_14",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggsekvensen visar ett komplett och konsistent blockförlopp: blocket tas emot av flera datanoder, lagras korrekt och raderas senare utan några fel, varningar eller oväntade undantag. Alla deletion- och invalid-rader följer på en normal blocklivscykel och det finns inga tecken på korruption, misslyckad replikering eller oväntade fel. Detta mönster är typiskt för normal blockhantering i HDFS.",
+  "summary": "Blocket blk_709268592365361671 tas emot och lagras av flera datanoder, blockMap uppdateras korrekt och blocket raderas senare från samtliga noder. Inga fel, varningar eller undantag förekommer. Händelseförloppet är konsistent med normal blockhantering i HDFS.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        6,
+        9,
+        11
+      ],
+      "observation": "Blocket mottas av flera datanoder och bekräftas mottaget.",
+      "interpretation": "Blocket distribueras och tas emot som förväntat i ett HDFS-kluster.",
+      "recommended_next_step": "Ingen åtgärd krävs, blockmottagningen är normal."
+    },
+    {
+      "event_type": "block_stored",
+      "severity": "normal",
+      "supporting_log_lines": [
+        7,
+        12,
+        13
+      ],
+      "observation": "blockMap uppdateras för samtliga noder som lagrar blocket.",
+      "interpretation": "Blocket lagras korrekt och blockMap hålls uppdaterad.",
+      "recommended_next_step": "Ingen åtgärd krävs, blocklagringen är normal."
+    },
+    {
+      "event_type": "block_invalidated_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "observation": "Blocket markeras som invalid och raderas från samtliga noder.",
+      "interpretation": "Blocket tas bort enligt normal HDFS-policy, t.ex. efter filradering eller replikhantering.",
+      "recommended_next_step": "Ingen åtgärd krävs om blockraderingen är förväntad (t.ex. efter filradering). Om blocket inte borde ha raderats, kontrollera filsystemets metadata och policy."
+    }
+  ],
+  "unsupported_claims": []
+}

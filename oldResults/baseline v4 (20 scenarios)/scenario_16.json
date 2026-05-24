@@ -1,0 +1,66 @@
+{
+  "scenario_id": "scenario_16",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Samtliga steg i blockhanteringen visas, inklusive blockmottagning, uppdatering och borttagning. Ingen ERROR-logg förekommer, och endast en enstaka WARN om misslyckat borttagande noteras, vilket är vanligt när ett block redan är raderat. Sekvensen och loggraderingarna indikerar normalt förlopp i HDFS med flera repliker och efterföljande opportuna deleteförsök.",
+  "summary": "Loggen beskriver ett normalt scenario där ett HDFS-block tas emot från flera noder, lagras och därefter markeras som ogiltigt samt raderas från olika data directories. Endast en mindre varning förekommer vid försök att radera ett block som redan är borttaget.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas av flera DataNodes och läggs till blockMap på tre noder.",
+      "interpretation": "Detta avspeglar normal process för blockreplikering och -lagring i HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockservering och replikering fungerar som förväntat."
+    },
+    {
+      "event_type": "block_marked_invalid_and_delete_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket markeras som ogiltigt på samtliga tre noder.",
+      "interpretation": "Vanligt förfarande exempelvis efter en ombalansering eller om blocket ej längre ska användas.",
+      "recommended_next_step": "Verifiera om blocket rätteligen skall raderas (om relevant för systemets syfte)."
+    },
+    {
+      "event_type": "block_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        20
+      ],
+      "observation": "Blocket tas bort från olika directory-paths.",
+      "interpretation": "Borttagning av blocket är som förväntat utifrån föregående markering som ogiltig.",
+      "recommended_next_step": "Ingen ytterligare åtgärd krävs om detta är förväntat beteende."
+    },
+    {
+      "event_type": "block_deletion_warning",
+      "severity": "warning",
+      "supporting_log_lines": [
+        19
+      ],
+      "observation": "Varning om att blocket inte kan raderas eftersom det saknas i volumeMap.",
+      "interpretation": "Detta är ofta normalt om blocket redan är raderat (idempotens), men kan annars indikera race condition eller manuella ändringar.",
+      "recommended_next_step": "Om återkommande, undersök synkronisering av volumeMap mellan DataNodes; annars ingen åtgärd."
+    }
+  ],
+  "unsupported_claims": []
+}

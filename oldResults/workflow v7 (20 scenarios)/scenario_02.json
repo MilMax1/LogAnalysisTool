@@ -1,0 +1,64 @@
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader tyder på ett regelrätt och fullständigt blockflöde i HDFS: blocket tas emot, repliceras, tilldelas lagringsnoder, verifieras samt slutligen tas bort enligt korrekt livscykelhantering. Inga error-, warn-, eller exception-meddelanden förekommer. Att blocket markeras som invalid och raderas är förenligt med normal blockhantering då t.ex. temporära data eller filer som raderas/skrivs om ofta leder till legitima blockdeletioner.",
+  "summary": "Blocket blk_7503483334202473044 hanteras enligt förväntad HDFS-livscykel: det tas emot från flera källor, lagras på flera noder, verifieras utan fel, och tas slutligen bort från samtliga noder. Alla loggrader visar väntat händelseflöde för ett temporärt eller raderat block utan avvikelser eller korruptionsindikatorer.",
+  "events": [
+    {
+      "event_type": "block_receive",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tas emot, hanteras och lagras på flera datanoder och lagringsnoden uppdateras utan fel.",
+      "interpretation": "Detta är förväntat vid blockreplikering i HDFS. Inga tecken på blockförlust, felaktiga källor eller misslyckad leverans.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_served",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14
+      ],
+      "observation": "Blocket levereras från en datanod till en klient.",
+      "interpretation": "Normalt tecken på att blocket är läsbart och korrekt replicerat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        15,
+        16
+      ],
+      "observation": "Verifiering av blocket lyckades två gånger.",
+      "interpretation": "Blocket var intakt när det kontrollerades. Ingen korruption.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidation_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket markeras som ogiltigt/invaliderat och tas bort från samtliga berörda noder.",
+      "interpretation": "Detta är normal procedur vid t.ex. borttagning av fil eller nedgradering av replika. Ingen indikation på onormal blockförlust.",
+      "recommended_next_step": "Ingen åtgärd krävs. Möjligen kontrollera att filradering/överskrivning var avsiktlig om detta önskemål finns från system- eller applikationsnivå."
+    }
+  ],
+  "unsupported_claims": []
+}

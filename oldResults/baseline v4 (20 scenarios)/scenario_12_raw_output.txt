@@ -1,0 +1,36 @@
+```json
+{
+  "scenario_id": "scenario_12",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla blockoperationer slutförs enligt förväntat flöde utan fel- eller varningsloggar. Blocket mottas, bekräftas och replikeras. Därefter initieras och slutförs borttagning på samtliga noder enligt logisk HDFS-retention.",
+  "summary": "Blocket blk_5668708402864483965 skrivs framgångsrikt till tre datanoder, blockMap uppdateras och bekräftelser tas emot. Senare läggs blocket till som ogiltigt (troligtvis som en följd av städning eller avslutad temporär fil), och blocket raderas fysiskt från alla inblandade datanoder utan några tecken på fel eller avvikelser.",
+  "events": [
+    {
+      "event_type": "Block mottagen och bekräftad på datanoder",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,5,6,10,11,12,13],
+      "observation": "Blocket tas emot från tre olika källor och blockbekräftelser (PacketResponder) terminerar normalt.",
+      "interpretation": "Blocköverföring och bekräftelseprocessen lyckades.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Replikering och blockMap-uppdatering",
+      "severity": "normal",
+      "supporting_log_lines": [4,7,8,9],
+      "observation": "blockMap uppdateras för alla tre datanoder med korrekt blockstorlek.",
+      "interpretation": "Replikering till samtliga noder har slutförts och namnservern är uppdaterad.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block markerad som invalid och raderad",
+      "severity": "normal",
+      "supporting_log_lines": [14,15,16,17,18,19],
+      "observation": "Blocket läggs till invalidSet på samtliga noder och tas därefter bort från filsystemet.",
+      "interpretation": "Blocket blir ogiltigt, troligen som en del av planerad HDFS-städning/filslut och raderas enligt förväntan.",
+      "recommended_next_step": "Bekräfta via applikationslogik att raderingen motsvarar avslutad hantering av temporär fil."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

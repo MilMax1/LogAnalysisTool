@@ -1,0 +1,36 @@
+```json
+{
+  "scenario_id": "scenario_17",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Loggscenariot visar ett i övrigt normalt blockmottagande och lagring, följt av att blocket markeras som ogiltigt och raderas från flera noder. Dock uppstår en oväntad varning vid radering: 'Unexpected error trying to delete block ... BlockInfo not found in volumeMap.' Detta tyder på inkonsistens i blockhanteringen, vilket är avvikande och kan indikera problem med blockmetadata eller datanodens interna tillstånd. Även om enstaka WARN- eller delete-rader kan vara normala, är just denna typ av varning ovanlig och diagnostiskt viktig.",
+  "summary": "Blocket mottas och lagras på flera noder, men markeras kort därefter som ogiltigt och raderas. Under raderingsprocessen uppstår en oväntad varning om att blockinformationen saknas i volumeMap, vilket indikerar en inkonsistens i blockhanteringen. Detta är inte ett normalt förlopp och bör undersökas vidare.",
+  "events": [
+    {
+      "event_type": "block_received_and_stored",
+      "severity": "normal",
+      "supporting_log_lines": [1, 3, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket blk_6331191059322192725 tas emot och lagras på flera datanoder utan fel.",
+      "interpretation": "Blockmottagandet och lagringen sker enligt förväntan.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del av förloppet."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deletion_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 19, 20],
+      "observation": "Blocket markeras som ogiltigt och raderas från flera datanoder.",
+      "interpretation": "Det är normalt att block raderas om de inte längre behövs eller är ogiltiga, men orsaken till invalid-markeringen framgår inte tydligt.",
+      "recommended_next_step": "Verifiera varför blocket markeras som ogiltigt, t.ex. om det är relaterat till filradering eller replikhantering."
+    },
+    {
+      "event_type": "unexpected_delete_error_blockinfo_not_found",
+      "severity": "anomaly",
+      "supporting_log_lines": [18],
+      "observation": "Vid radering av blocket uppstår en varning: 'Unexpected error trying to delete block ... BlockInfo not found in volumeMap.'",
+      "interpretation": "Detta indikerar att blockets metadata saknas i datanodens volumeMap vid radering, vilket är en inkonsistens och kan tyda på buggar, race conditions eller korruption.",
+      "recommended_next_step": "Undersök datanodens loggar för ytterligare fel kring volumeMap och blockhantering. Kontrollera om liknande fel uppstår för andra block. Överväg att köra fsck och verifiera filsystemets konsistens."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

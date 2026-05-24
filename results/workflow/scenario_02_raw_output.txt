@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar ett komplett och konsistent blockförlopp: blocket tas emot, lagras, verifieras och raderas utan några fel, varningar eller undantag. Alla deletion- och invalid-rader sker efter att blocket har tagits emot, lagrats och verifierats, vilket är normalt vid blocklivscykelns slut. Inga tecken på korruption, misslyckade operationer eller oväntade fel förekommer.",
+  "summary": "Blocket blk_7503483334202473044 tas emot från flera noder, lagras korrekt, verifieras framgångsrikt och raderas därefter från samtliga noder. Alla steg sker i förväntad ordning och utan fel eller varningar. Detta är ett normalt scenario för blockhantering i HDFS.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket mottas från flera källor och lagras på flera noder.",
+      "interpretation": "Blocket distribueras och lagras enligt HDFS-replikationsprinciper.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_served",
+      "severity": "normal",
+      "supporting_log_lines": [14],
+      "observation": "Blocket serveras till en klient.",
+      "interpretation": "Blocket är tillgängligt och kan läsas av klienter.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [15, 16],
+      "observation": "Blocket verifieras framgångsrikt två gånger.",
+      "interpretation": "Blockets integritet är bekräftad.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket markeras som ogiltigt och raderas från samtliga noder.",
+      "interpretation": "Blocket tas bort enligt normal livscykel, t.ex. efter att filen tagits bort eller ersatts.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

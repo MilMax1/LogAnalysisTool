@@ -1,0 +1,34 @@
+{
+  "scenario_id": "scenario_15",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Loggsekvensen visar ett komplett och konsistent blockförlopp: blocket tas emot av flera datanoder, lagras och registreras i blockMap, och tas senare bort från systemet via invalidSet och fysisk radering. Det finns inga fel, varningar eller undantag i loggarna. Mönstret med invalidSet och deletion är vanligt vid normal blocklivscykel, t.ex. när en fil tas bort eller skrivs över. Inga tecken på korruption, misslyckad replikering eller oväntade fel förekommer.",
+  "summary": "Blocket blk_-7042855855719423267 tas emot och lagras på flera datanoder, registreras korrekt i blockMap, och tas därefter bort från systemet via invalidSet och fysisk radering. Alla steg sker utan fel eller varningar. Detta är ett normalt förlopp vid t.ex. filradering eller omskrivning.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 6, 8, 10],
+      "observation": "Blocket mottas av flera datanoder och bekräftas mottaget.",
+      "interpretation": "Blocket distribueras och tas emot som förväntat i ett HDFS-kluster.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockmottagning är normal."
+    },
+    {
+      "event_type": "block_registered",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blocket registreras i blockMap på flera noder.",
+      "interpretation": "Blocket är korrekt tillagt i HDFS metadata.",
+      "recommended_next_step": "Ingen åtgärd krävs; blockregistrering är normal."
+    },
+    {
+      "event_type": "block_invalidated_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras som invalid och tas bort från alla noder.",
+      "interpretation": "Blocket tas bort enligt normal livscykel, t.ex. vid filradering eller omskrivning.",
+      "recommended_next_step": "Om blockradering inte var förväntad, kontrollera filsystemets användaraktivitet eller policyer. Annars ingen åtgärd."
+    }
+  ],
+  "unsupported_claims": []
+}

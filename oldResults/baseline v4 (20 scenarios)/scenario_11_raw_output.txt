@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_11",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Block mottas och distribueras korrekt till flera datanoder, blockMap uppdateras för alla aktuella noder, och blocket tas bort på förväntat vis utan fel- eller varningsloggar. Deletion-raderna sker utan ERROR eller varningsnivå, vilket är vanligt t.ex. vid temporära filer eller normal garbage collection.",
+  "summary": "Block blk_4237356440788557206 tas emot och distribueras redundat till datanoder, blockMap uppdateras, och blocket rensas från systemet enligt förväntat förlopp. Alla loggrader är INFO och följer ett typiskt successförlopp för temporary/interim data eller post-komplettering av en fil.",
+  "events": [
+    {
+      "event_type": "block_receive",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4],
+      "observation": "Blocket tas emot från flera källor och blockallokering loggas.",
+      "interpretation": "Multipla datanoder mottar blocket som väntat för redundans.",
+      "recommended_next_step": "Verifiera om det vidare filflödet är komplett om ytterligare problem rapporteras, annars ingen åtgärd behövs."
+    },
+    {
+      "event_type": "block_write_complete",
+      "severity": "normal",
+      "supporting_log_lines": [5, 6, 7, 8, 9, 10],
+      "observation": "PacketResponder avslutas för samtliga mottagande datanoder och blocket mottags korrekt med förväntad storlek.",
+      "interpretation": "Blocket är fullständigt och felfritt replicerat.",
+      "recommended_next_step": "Ingen ytterligare åtgärd krävs så länge blocklagring är förväntad."
+    },
+    {
+      "event_type": "block_map_update",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "blockMap uppdateras med blockets närvaro på samtliga noder.",
+      "interpretation": "Blocket har annonserats och ingått i systemets kännedom om repliker.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidation",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras för ogiltigförklaring och tas därefter bort på samtliga noder.",
+      "interpretation": "Vanligt scenario t.ex. för temporära output-block eller efter completed commit; inget tyder på misslyckande eller inkonsekvent statushantering.",
+      "recommended_next_step": "Endast felsök om blocket inte borde raderas. Verifiera i så fall applikationslogik."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

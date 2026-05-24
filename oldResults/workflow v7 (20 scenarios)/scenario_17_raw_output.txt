@@ -1,0 +1,45 @@
+{
+  "scenario_id": "scenario_17",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Även om stora delar av blockets livscykel följer ett normalt mönster (mottagning, lagring, markering för deletion), indikerar raden med WARN att ett oväntat fel uppstod vid försök att ta bort blocket: 'BlockInfo not found in volumeMap'. Denna typ av fel är inte typiskt för normal blockhantering och antyder inkonsistens i datanodens metadatahantering, även om processen fortsätter. Det går ej att fastställa att blockhanteringen varit helt korrekt.",
+  "summary": "Blocket blk_6331191059322192725 mottogs, lagrades och markerades senare som invalid/raderad på flera noder enligt förväntad livscykel. Dock inträffar ett oväntat fel (WARN) vid borttagning där blockinformationen saknas i volumeMap. Detta tyder på en potentiell inkonsistens i DataNode:s blockmetadata. Sådan avvikelse anses vara en anomali även utan ERROR-rad, då det bryter mot förväntad sekvens för blockhantering.",
+  "events": [
+    {
+      "event_type": "Block reception",
+      "severity": "normal",
+      "supporting_log_lines": [1, 3, 4, 6, 8, 10],
+      "observation": "Blocket tas emot av flera datanoder och kvitteras som mottaget.",
+      "interpretation": "Normal del av blockets replikeringsprocess.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för denna del."
+    },
+    {
+      "event_type": "Block added to blockMap",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blocket registreras på tre olika DataNodes i NameNode:s blockMap.",
+      "interpretation": "Normal bekräftelse på lagrad och registrerad blockreplika.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för denna del."
+    },
+    {
+      "event_type": "Block marked invalid and deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 19, 20],
+      "observation": "Blocket markeras i invalidSet och deletion initieras på flera DataNodes.",
+      "interpretation": "Kan vara normal procedure för exempelvis filradering eller blockersättning.",
+      "recommended_next_step": "Ingen åtgärd nödvändig om delete skedde som väntat, men loggar vidareutreds om deletion beror på fel."
+    },
+    {
+      "event_type": "Unexpected error deleting block (BlockInfo not found)",
+      "severity": "anomaly",
+      "supporting_log_lines": [18],
+      "observation": "WARN: Ovänat fel vid delete—blockinformationen saknas i volumeMap.",
+      "interpretation": "Detta tyder på inkonsistens i blockmetadata, vilket är avvikande från normal blockhantering.",
+      "recommended_next_step": "Analysera DataNode-volymens metadata, kontrollera loggar bakåt i tiden, verifiera att DataNode/volumeMap är konsekventa, sök efter fler liknande anomalier."
+    }
+  ],
+  "unsupported_claims": [
+    "Det går ej att säkert avgöra om denna inkonsistens ledde till faktisk datakorruption eller dataförlust baserat på nuvarande loggrad.",
+    "Det finns inget tydligt stöd för att blocket saknas helt eller att fler operationer påverkas förutom detta block."
+  ]
+}

@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_13",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar ett komplett och konsistent blockförlopp: blocket allokeras, tas emot av flera datanoder, lagras korrekt och raderas därefter från alla noder utan några fel, varningar eller tecken på korruption. Alla deletion- och invalid-rader följer på blockmottagning och lagring, vilket är normalt vid exempelvis temporära filer eller block som inte längre behövs. Inga fel, varningar eller undantag förekommer.",
+  "summary": "Blocket blk_-4334049176684001514 genomgår en normal livscykel: det allokeras, tas emot och lagras på flera datanoder, markeras senare som ogiltigt och raderas från samtliga noder. Inga fel, varningar eller oväntade avbrott förekommer i loggarna.",
+  "events": [
+    {
+      "event_type": "block_allocation",
+      "severity": "normal",
+      "supporting_log_lines": [1],
+      "observation": "Blocket blk_-4334049176684001514 allokeras för en temporär fil.",
+      "interpretation": "Starten på ett normalt blockförlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [2, 3, 4, 6, 8, 10],
+      "observation": "Blocket tas emot av flera datanoder och bekräftas mottaget med korrekt storlek.",
+      "interpretation": "Blocket distribueras och lagras som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_stored",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "BlockMap uppdateras för att visa att blocket lagrats på tre olika datanoder.",
+      "interpretation": "Blocket är korrekt replikerat och lagrat.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalidated_and_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16, 17, 18, 19],
+      "observation": "Blocket markeras som ogiltigt och raderas från samtliga datanoder.",
+      "interpretation": "Detta är normalt för temporära block eller block som inte längre behövs, exempelvis efter att en temporär fil skrivits färdigt eller raderats.",
+      "recommended_next_step": "Ingen åtgärd krävs om detta motsvarar förväntad filhantering. Om blocket oväntat raderas, kontrollera applikationslogik och filsystemoperationer."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

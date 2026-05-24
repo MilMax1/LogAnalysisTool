@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_15",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett komplett och konsistent blockförlopp: blocket tas emot, lagras på flera noder, markeras senare som ogiltigt och tas bort. Inga tecken på fel, varningar eller inkonsekvenser i loggflödet.",
+  "summary": "Blocket blk_-7042855855719423267 tas emot och lagras på flera datanoder, markeras senare som ogiltigt på samtliga noder och tas därefter bort från filsystemet. Alla steg sker utan fel eller varningar.",
+  "events": [
+    {
+      "event_type": "block_received",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "observation": "Blocket mottas från flera källor och bekräftas mottaget på olika datanoder.",
+      "interpretation": "Blocket distribueras och lagras enligt förväntat HDFS-flöde.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_map_update",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "blockMap uppdateras med blocket på tre olika noder.",
+      "interpretation": "Blocket är nu replikerat och tillgängligt på flera noder.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_marked_invalid",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) på samtliga noder.",
+      "interpretation": "Blocket har blivit föråldrat eller borttaget enligt normal HDFS-hantering.",
+      "recommended_next_step": "Ingen åtgärd krävs om detta är förväntat (t.ex. efter filradering)."
+    },
+    {
+      "event_type": "block_deleted",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19],
+      "observation": "Blocket tas bort från filsystemet på samtliga noder.",
+      "interpretation": "Blocket raderas fysiskt från lagringsnoderna enligt förväntat förlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

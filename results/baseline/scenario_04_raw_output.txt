@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket först skrivs och verifieras korrekt på flera noder, uppstår ett stort antal varningar (WARN) om undantag vid försök att läsa ut blocket från flera datanoder till olika klienter. Slutligen markeras blocket som ogiltigt och tas bort från samtliga noder. Detta indikerar ett avvikande och misslyckat blockförlopp, även om inga ERROR-rader förekommer.",
+  "summary": "Blocket blk_7854771516489510256 skrivs och verifieras korrekt på flera noder, men därefter misslyckas upprepade läsförsök från flera klienter, vilket resulterar i många WARN-meddelanden om undantag. Blocket markeras sedan som ogiltigt och tas bort från alla noder. Detta tyder på ett avvikande och misslyckat blockförlopp.",
+  "events": [
+    {
+      "event_type": "Block allocation and replication",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      "observation": "Blocket mottas, replikeras och blockkartan uppdateras på tre noder.",
+      "interpretation": "Blocket skrivs och replikeras enligt förväntan.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Verifiering av blocket lyckas på flera noder.",
+      "interpretation": "Blocket är initialt intakt och tillgängligt.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas."
+    },
+    {
+      "event_type": "Repeated exceptions during block serving",
+      "severity": "anomaly",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32],
+      "observation": "Upprepade WARN-meddelanden om undantag vid försök att läsa blocket från flera datanoder till olika klienter.",
+      "interpretation": "Blocket kan inte läsas ut till klienter från flera noder, vilket tyder på ett allvarligt problem med blockets tillgänglighet eller integritet.",
+      "recommended_next_step": "Undersök loggar för detaljerade undantagsmeddelanden och kontrollera nätverks- och diskstatus på berörda noder."
+    },
+    {
+      "event_type": "Block marked as invalid and deleted",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket markeras som ogiltigt och tas bort från samtliga noder.",
+      "interpretation": "Systemet anser att blocket är korrupt eller otillgängligt och tar bort det.",
+      "recommended_next_step": "Analysera varför blocket blev ogiltigt, kontrollera eventuella hårdvarufel eller nätverksproblem, och verifiera att replikering och återställning fungerar korrekt."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

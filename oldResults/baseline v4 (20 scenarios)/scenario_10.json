@@ -1,0 +1,66 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Flera blockrelaterade undantag och anslutningsfel förekommer under blocköverföringen och ingen indikation ges om att överföringen lyckats. Flera exception-meddelanden under samma block tyder på ett misslyckat eller inkonsekvent förlopp.",
+  "summary": "Blocköverföringsprocessen för blk_-3102267849859399193 uppvisar upprepade anslutningsproblem och undantag, vilket indikerar att blocket sannolikt inte kunde överföras eller lagras korrekt.",
+  "events": [
+    {
+      "event_type": "block_receive_initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2
+      ],
+      "observation": "Block blk_-3102267849859399193 mottas från två olika källportar.",
+      "interpretation": "Överföring av blocket har initierats normalt.",
+      "recommended_next_step": "Verifiera om det är förväntat med parallella överföringsförsök från samma nod."
+    },
+    {
+      "event_type": "allocate_block",
+      "severity": "normal",
+      "supporting_log_lines": [
+        3
+      ],
+      "observation": "Blocket allokeras i filsystemet.",
+      "interpretation": "Systemet försöker skriva blocket till rätt plats i filsystemträdet.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "block_write_exception_socket_timeout",
+      "severity": "error",
+      "supporting_log_lines": [
+        4
+      ],
+      "observation": "writeBlock för blocket gav SocketTimeoutException.",
+      "interpretation": "Överföringen av blocket misslyckades på grund av timeout, vilket ofta indikerar nätverksproblem eller att datanoden inte svarade i tid.",
+      "recommended_next_step": "Kontrollera nätverksanslutningar och eventuella resursbegränsningar på datanoden."
+    },
+    {
+      "event_type": "packet_responder_exception_eof",
+      "severity": "warning",
+      "supporting_log_lines": [
+        5,
+        6
+      ],
+      "observation": "PacketResponder för blocket termineras efter att ha fått en EOFException.",
+      "interpretation": "Klientsidan eller upstream-noden stängde anslutningen oväntat under blocköverföringen.",
+      "recommended_next_step": "Undersök loggar från klienten/andra inblandade noder för mer information om varför anslutningen stängdes."
+    },
+    {
+      "event_type": "block_receive_connection_reset",
+      "severity": "error",
+      "supporting_log_lines": [
+        7,
+        8
+      ],
+      "observation": "Exception java.io.IOException: Connection reset by peer under mottagning och skrivning av blocket.",
+      "interpretation": "Motparten stängde anslutningen oväntat, vilket ofta är tecken på ett fel eller resursproblem på klienten eller nätverksnivå.",
+      "recommended_next_step": "Granska konfiguration, klientloggar och nätverksstatus för att hitta orsaken till anslutningsreset."
+    }
+  ],
+  "unsupported_claims": [
+    "Det är oklart om blocket faktiskt förlorades permanent eller om retry- och replikationsmekanismer senare lyckades.",
+    "Det saknas direkt information om exakt orsak till anslutningsproblemen, exempelvis om det beror på överbelastning, nätverksfel eller konfigurationsproblem."
+  ]
+}

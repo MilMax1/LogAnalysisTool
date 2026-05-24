@@ -1,0 +1,42 @@
+{
+  "scenario_id": "scenario_05",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Blocket mottas och sparas av flera DataNodes, verifieras utan fel och markeras senare för borttagning (invalidSet/deletion) efter vad som är en full livscykel. Flera WARN/exception-rader (rad 17-32) om problem vid tjänstgöring av blocket förekommer men är ett vanligt, icke-exceptionellt mönster som inte stöds av ERROR-nivå, korruptionsspår, eller oväntade fel. Inga tecken på blockkorruption, överträdelser eller misslyckanden utöver förväntade undantag vid block-serving. Samtliga DataNodes tar emot, verifierar och hanterar blocket korrekt innan normal deletion.",
+  "summary": "Blocket mottogs, lagrades och verifierades på tre noder utan tecken på integritetsproblem. Det finns återkommande exception/warnings vid block-serving, vilket är vanligt i HDFS, men inga fel av högre allvarlighetsgrad registrerades. Blocket tas senare bort på normalt sätt, vilket troligtvis markerar slutet på dess tänkta livscykel. Sammantaget finns inga loggrader som indikerar ett anomalt förlopp.",
+  "events": [
+    {
+      "event_type": "Block reception and storage",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket mottas och tilldelas tre DataNodes och blockMap uppdateras för var och en.",
+      "interpretation": "Blockdistribution och initial lagring har fungerat som förväntat.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Samtliga block repliker verifieras framgångsrikt.",
+      "interpretation": "Blocket visar inga korruptions- eller beroendefel.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    },
+    {
+      "event_type": "Exceptions during block serving",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Flera WARN-meddelanden om exception under block-serving, riktade till olika klienter/adresser.",
+      "interpretation": "Detta är vanligt i reala HDFS-system (t.ex. avbrutna fetches, klientproblem, timeout), speciellt utan ERROR eller korruptionsmeddelanden. Normalt mönster, ej anomali utan andra fel samtidigt.",
+      "recommended_next_step": "Vid återkommande klientproblem kan närmare orsak/belastning för exceptions undersökas, men ingen akut åtgärd vid denna händelsekedja."
+    },
+    {
+      "event_type": "Normal deletion of block",
+      "severity": "normal",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket sätts i invalidSet och tas bort från samtliga lagringsnoder.",
+      "interpretation": "Raderingen följer på normalt förlopp (t.ex. filborttag). Inga symptom på tvingad eller anomal borttagning.",
+      "recommended_next_step": "Ingen åtgärd behövs."
+    }
+  ],
+  "unsupported_claims": []
+}

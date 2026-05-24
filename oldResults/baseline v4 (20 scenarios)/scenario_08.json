@@ -1,0 +1,89 @@
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots normal blockmottagning och verifiering finns en omfattande mängd varningar om undantag vid åtkomst till blocket från flera noder följt av borttagning och återkomst/felplacering av blocket, vilket indikerar inkonsistens eller problem i blockhanteringen.",
+  "summary": "Blocket blk_3947106522258141922 mottas och verifieras med lyckat resultat på flera noder. Kort därefter uppstår upprepade varningar om undantag när blocket ska levereras till klienter. Till slut markeras blocket som ogiltigt och raderas från alla involverade noder, men sedan tillkommer blocket åter på en nod utan tillhörighet till en fil, innan det åter raderas. Helhetsbilden tyder på ett inkonsekvent och misslyckat blockhanteringsförlopp snarare än normal drift.",
+  "events": [
+    {
+      "event_type": "block_reception_and_verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket tas emot och lagras på flera noder, blockMap uppdateras, och verifieringen lyckas upprepade gånger.",
+      "interpretation": "Standardblockskrivning och initial lagringsprocess fungerar korrekt.",
+      "recommended_next_step": "Ingen åtgärd krävs för just denna fas."
+    },
+    {
+      "event_type": "multiple_exceptions_on_block_serving",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "Återkommande WARN-meddelanden om undantag från flera datanoder vid försök att leverera blocket till ett stort antal klienter.",
+      "interpretation": "Onormal mängd undantag när blocket ska läsas, vilket indikerar att klienter ogiltigt misslyckas med att få tillgång till blocket.",
+      "recommended_next_step": "Undersök detaljerad felorsak till undantagen i DataXceiver. Kontrollera noder, nätverk och blockmetadata/konsistens."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "warning",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        40
+      ],
+      "observation": "Blocket läggs till invalidSet och filen tas bort från flera noder.",
+      "interpretation": "Systemet hanterar upprepat eller globalt fel på blocket genom att markera det ogiltigt och radera det.",
+      "recommended_next_step": "Se om detta är konsistent i metadata över cluster och om andra block/kunder påverkas."
+    },
+    {
+      "event_type": "block_reappears_without_file",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        38,
+        39,
+        40
+      ],
+      "observation": "addStoredBlock mottagen för block utan koppling till någon fil; blockMap uppdateras ändå; blocket tas bort igen.",
+      "interpretation": "Blocket försöker återinträda i namnrymden trots att det inte längre tillhör en fil; tecken på inkonsekvens i blockkatalogens tillstånd.",
+      "recommended_next_step": "Kontrollera om blockkatalog/database behöver rensas och om blockkopplingar är korrekta. Granska logs för liknande re-misplacerade block."
+    }
+  ],
+  "unsupported_claims": [
+    "Det finns inga indikationer på varför undantagen inträffade (exempel: diskfel, nätverksavbrott, korruption osv.), endast att exception förelåg.",
+    "Det finns ingen indikation på om andra block också är drabbade, eller om det är en isolerad incident."
+  ]
+}

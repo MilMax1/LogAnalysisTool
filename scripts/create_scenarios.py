@@ -5,7 +5,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 HDFS_LOG_PATH = PROJECT_ROOT / "data" / "HDFS.log"
 SCENARIOS_DIR = PROJECT_ROOT / "scenarios"
 
-# de block som hämtats, kan byta ID här om någon inte var lämplig
+# scenarion slumpmässigt valda med 50% normal och 50% anomaly 
 SCENARIOS = [
     ("scenario_01", "blk_-1608999687919862906", "Normal"),
     ("scenario_02", "blk_7503483334202473044", "Normal"),
@@ -17,9 +17,18 @@ SCENARIOS = [
     ("scenario_08", "blk_3947106522258141922", "Anomaly"),
     ("scenario_09", "blk_7956543127401791181", "Anomaly"),
     ("scenario_10", "blk_-3102267849859399193", "Anomaly"),
+    ("scenario_11", "blk_4237356440788557206", "Normal"),
+    ("scenario_12", "blk_5668708402864483965", "Normal"),
+    ("scenario_13", "blk_-4334049176684001514", "Normal"),
+    ("scenario_14", "blk_709268592365361671", "Normal"),
+    ("scenario_15", "blk_-7042855855719423267", "Normal"),
+    ("scenario_16", "blk_6248210333079836276", "Anomaly"),
+    ("scenario_17", "blk_6331191059322192725", "Anomaly"),
+    ("scenario_18", "blk_8240042894352190894", "Anomaly"),
+    ("scenario_19", "blk_6426032162622263299", "Anomaly"),
+    ("scenario_20", "blk_5133973138291673173", "Anomaly"),
 ]
 
-# numrera loggradera så att de lättare kan refereras till i analysen
 def number_log_lines(lines: list[str]) -> str:
     return "\n".join(
         f"[{index + 1}] {line}"
