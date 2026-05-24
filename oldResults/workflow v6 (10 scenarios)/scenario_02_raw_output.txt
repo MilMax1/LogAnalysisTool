@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggarna visar blockmottagning, validering, blockserving, lyckad verifiering och därefter korrekt blockdeletion enligt normal livscykel. Det finns inga varningar, fel eller exception-rader. Invalid- och deletion-rader förekommer men följer normalt blocktillstånd efter normal hantering. All inblandning av servers och block-status rapporteras utan anomalier.",
+  "summary": "Blocket blk_7503483334202473044 tas emot av flera DataNodes, lagras, verifieras två gånger med lyckade resultat, servas ut till en klient, och raderas senare från samtliga repliker som del av en normal raderingsprocess. Ingen rad anger några fel eller inkonsistenser.",
+  "events": [
+    {
+      "event_type": "block_reception",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket tas emot av tre olika DataNodes och blockMap uppdateras korrekt.",
+      "interpretation": "Blockmottagningen fungerar som avsett; blockMap uppdateras på NameNode utan fel.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [15, 16],
+      "observation": "Blocket verifieras två gånger, båda lyckas.",
+      "interpretation": "Blockintegritet är säkerställd; inga tecken på korruption.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_serving",
+      "severity": "normal",
+      "supporting_log_lines": [14],
+      "observation": "Blocket servas ut till en klient.",
+      "interpretation": "Blocket är tillgängligt för klienten, vilket bekräftar korrekt hantering.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "block_invalid_and_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22],
+      "observation": "Blocket markeras som 'invalid' och tas bort på samtliga repliker.",
+      "interpretation": "Denna sekvens är vanligt förekommande i blocklivscykeln när filer eller block tas bort normalt (t.ex. filradering, expiry eller ombalansering). Ingen indikation på att deletion är felaktigt initierad.",
+      "recommended_next_step": "Verifiera i överliggande system om blockraderingen förväntas (t.ex. filradering/expiry). Ingen felsökning krävs utifrån loggarna."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

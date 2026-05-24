@@ -1,0 +1,34 @@
+{
+  "scenario_id": "scenario_01",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar ett typiskt och komplett livscykelförlopp för ett HDFS-block. Blocket tas emot och replikeras till flera datanoder (med korrekt uppdatering av blockMap), det servas till flera klienter eller noder, och avslutas med att blocket markeras som ogiltigt (invalidSet) och raderas från datanoderna. Inga ERROR, WARN, exception eller korruptionsrelaterade rader förekommer. Delete- och invalidSet-mönster är i linje med normal blockhantering i HDFS när en fil raderas. Alla steg sker utan avbrott eller inkonsekvens i loggraderna.",
+  "summary": "Blocket blk_-1608999687919862906 mottas, replikeras, servas ut till många noder, därefter markeras det som ogiltigt och raderas – utan tecken på fel, korruption, misslyckad replikering eller anomalier. Detta indikerar ett normalt scenario för blockhantering och borttagning i HDFS.",
+  "events": [
+    {
+      "event_type": "Block initialization and replication",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 47, 48, 49, 65, 66, 112, 150, 151, 152, 158, 163],
+      "observation": "Blocket tas emot, lagras och replikeras till flera datanoder enligt blockMap-uppdateringar och replication requests.",
+      "interpretation": "Normalt förlopp där ett nytt block skrivs och replikeras/överförs enligt HDFS-protokoll. Inga tecken på misslyckad replikering. Paketresponder-termineringar (rad 5, 6, 9) och mottagna block (rad 7, 8, 10) är i linje med avslutat skrivsteg.",
+      "recommended_next_step": "Ingen åtgärd krävs så länge detta mönster stämmer för samtliga block. Verifiera för liknande normalitet i loggar för andra block."
+    },
+    {
+      "event_type": "Serving of block",
+      "severity": "normal",
+      "supporting_log_lines": [23, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 153, 154, 155, 156, 157, 159, 160, 161, 162, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249],
+      "observation": "Blocket servas till många olika noder, vilket indikerar hög tillgänglighet och efterfrågan.",
+      "interpretation": "Servande/utleverans av blocket fungerar korrekt och återkommande, vilket passar för filer som används aktivt innan de tas bort.",
+      "recommended_next_step": "Ingen åtgärd krävs. Om onormalt beteende skulle misstänkas (t.ex. för många serves i hög fart), kontrollera systemets workload context."
+    },
+    {
+      "event_type": "Block invalidation and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) för samtliga relaterade datanoder och raderas fysiskt från deras lagringskatalog.",
+      "interpretation": "Exakt detta mönster är väntat när t.ex. en fil som innehåller blocket raderas från HDFS. Detta är helt normalt och är ett nödvändigt steg för att frigöra lagringsutrymme och hållas systemet konsistent.",
+      "recommended_next_step": "Bekräfta att motsvarande filradering har utförts i applikationsnivån vid denna tidpunkt – ingen misstänkt avvikelse mot normal blocklivscykel."
+    }
+  ],
+  "unsupported_claims": []
+}

@@ -1,0 +1,45 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Trots förekomsten av många WARN/exception-rader när blocket serveras rapporterar loggarna inte några ERROR- eller korruptions-mönster, och blockverifiering lyckas innan undantagen uppträder. Blocket tas emot, replikeras, verifieras, och tas sedan bort enligt normal HDFS-livscykel. WARN-raderna hänför sig till vanliga serveringsexception som ofta uppträder utan faktisk dataförlust, och blocket tas bort på ett konsistent sätt på samtliga noder. Mönstret är typiskt för block som tas bort efter upprepade accessförsök och motsvarar inte en tydlig anomali utan snarare normal blockhantering.",
+  "summary": "Blocket skrivs och tas emot på flera noder, verifieras tre gånger, och serving-exceptions inträffar vid accessförsök efter verifiering. Blocket markeras därefter som invalid och raderas synkront från samtliga noder, vilket indikerar normal hantering och ingen explicit dataförlust eller korruption dokumenterad i loggarna.",
+  "events": [
+    {
+      "event_type": "block reception and replication",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket tas emot från flera källor och läggs till blockmap på tre noder.",
+      "interpretation": "Detta är normal blockmottagning och replikation i HDFS.",
+      "recommended_next_step": "Ingen åtgärd krävs, men bekräfta att blockreplikerna alltid läggs till på förväntade datanoder."
+    },
+    {
+      "event_type": "block verification",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras och verifikationen lyckas på tre separata tillfällen.",
+      "interpretation": "Inga tecken på blockkorruption – normalt förfarande efter blockmottagning.",
+      "recommended_next_step": "Ingen omedelbar åtgärd. Möjliggör fortsatt övervakning för att upptäcka eventuella framtida korruptionsproblem."
+    },
+    {
+      "event_type": "repeated block serving exceptions",
+      "severity": "warning",
+      "supporting_log_lines": [17,18,19,20,21,22,23,24,25,26,27,28,30,31,32],
+      "observation": "Flera warning-loggingar med 'Got exception while serving' när blocket försöks serveras till olika IP-adresser.",
+      "interpretation": "Denna exception är vanlig och kan uppstå av flera skäl (klient avbröt, nätverksproblem, klient läste block som tagits bort etc). Förekomsten på flera noder tyder inte nödvändigtvis på blockkorruption.",
+      "recommended_next_step": "Granska systemloggar eller klientloggar i anslutande system för att avgöra orsaken till att blocket ej kunde serveras om applikationsnivåproblem misstänks."
+    },
+    {
+      "event_type": "block marked invalid and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [33,34,35,36,37,38],
+      "observation": "Blocket läggs till invalidSet och tas bort på samtliga noder.",
+      "interpretation": "Normal blockradering efter livscykelslut eller efter att blocket ej längre behövs (t.ex. fil raderades). Ingen explicit felindikator.",
+      "recommended_next_step": "Ingen åtgärd nödvändig, men kontrollera om blocket raderades enligt förväntad HDFS-policy (t.ex. filradering, retention eller underhåll)."
+    }
+  ],
+  "unsupported_claims": [
+    "Att blocket är korrupt eller har gått förlorat – verifieringsloggar och blockraderingsloggar stödjer inte detta.",
+    "Att exception måste bero på HDFS-fel – cause kan vara klientproblem eller att blocket redan inte längre existerar."
+  ]
+}

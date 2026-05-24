@@ -1,0 +1,39 @@
+```json
+{
+  "scenario_id": "scenario_05",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Trots att blocket först tas emot och verifieras korrekt, upprepas många WARN-meddelanden om undantag vid försök att leverera blocket till olika klienter. Dessa följs inte av ERROR eller explicit korruptionsvarning, men mönstret av återkommande misslyckanden att tjänstgöra blocket mot flera klienter, avslutas med borttagning av blocket, vilket tillsammans pekar på en avvikelse i blockets användningscykel.",
+  "summary": "Blocket mottas, lagras och verifieras utan fel, men en längre sekvens av undantag (WARN) inträffar vid servering av blocket mot många klienter. Därefter sätts blocket till 'invalid' och tas bort från systemet. Detta antyder problem vid åtkomst till blocket, trots att ingen explicit blockkorruption rapporterats.",
+  "events": [
+    {
+      "event_type": "Block mottaget, replikerat och verifierat",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      "observation": "Blocket blk_1717858812220360316 tas emot från flera noder, replikeras och verifieringskontroller lyckas upprepade gånger.",
+      "interpretation": "Inga tecken på fel vid mottagandet, replikeringen, eller den periodiska verifieringen. Uppladdning och initial tillgänglighet fungerar.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas."
+    },
+    {
+      "event_type": "Upprepade exceptions vid servering av block",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Många WARN-meddelanden om undantag vid försök att leverera blocket till olika klienter, spridda över de tre datanoderna.",
+      "interpretation": "Återkommande misslyckanden vid läsning av blocket. Detta är ovanligt och kan peka på åtkomst-relaterade problem, nätverksproblem eller klientproblem.",
+      "recommended_next_step": "Analysera varför blocket inte kan serveras: kontrollera loggdetaljer om exceptions, sök efter tillhörande klientloggar, utred om nätverksfel eller klientspecifika problem föreligger."
+    },
+    {
+      "event_type": "Block markerat som ogiltigt och raderat",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Bloket tas bort från samtliga noder och markeras som ogiltigt kort efter de upprepade varningsmeddelandena.",
+      "interpretation": "Detta sker ofta om blocket bedömts oanvändbart av NameNode, eventuellt till följd av de tidigare problemen vid åtkomst/servering.",
+      "recommended_next_step": "Utred om raderingen var planerad (t.ex. manuellt raderad fil) eller om blocket blev ogiltigt pga korruption eller otillgänglighet. Kontrollera även NameNode-loggar för mer information."
+    }
+  ],
+  "unsupported_claims": [
+    "Blockkorruption är huvudorsak – det stöds ej explicit av loggarna, då verifieringarna lyckas.",
+    "Noderna själva kraschar eller tappar blocket permanent – inga ERROR eller FATAL tecken finns."
+  ]
+}
+```

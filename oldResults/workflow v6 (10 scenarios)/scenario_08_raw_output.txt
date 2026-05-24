@@ -1,0 +1,46 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggförloppet visar en normal mottagning och verifiering av blocket i början, men efter många exception-rader för blockservering markeras blocket som ogiltigt och raderas från alla hosts. Därefter sker ett försök att lägga till blocket i blockkartan där systemet noterar att blocket inte längre tillhör någon fil. Detta sekvensmönster tyder på ett avvikande blockförlopp där något går fel efter början, blocket blir inkonsekvent och till sist raderas, vilket är klassiskt för block-lifecycle-anomalier i HDFS.",
+  "summary": "Blocket mottas och verifieras initialt utan fel. Senare inträffar upprepade exceptions vid försök att serva blocket till clients, vilket följs av att blocket markeras som ogiltigt och raderas från alla noder. Slutligen loggas ett försök att lägga till blocket på en nod där systemet konstaterar att det inte längre tillhör någon fil. Denna följd av händelser indikerar en anomali där blocket blir inkonsekvent eller korrupt och tas ur bruk.",
+  "events": [
+    {
+      "event_type": "Block mottas och verifieras utan fel",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 9, 10, 12, 13, 14, 15, 16],
+      "observation": "Blocket mottas på flera noder och verifieras framgångsrikt upprepade gånger.",
+      "interpretation": "Initieringen av blocket och dess lagring är normal och ger inga tecken på omedelbara problem.",
+      "recommended_next_step": "Ingen åtgärd här, men viktigt att jämföra inlederande normala loggrader med senare anomala händelser."
+    },
+    {
+      "event_type": "Upprepade undantag (exceptions) vid försök att serva blocket",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32
+      ],
+      "observation": "WARN-rader om undantag visas vid försök att serva blocket till olika clients.",
+      "interpretation": "Detta tyder på att något är fel med blocket eller kommunikationen, men är inte i sig tillräckligt för anomali, eftersom vissa exception kan förekomma i normaldrift. Dock är antalet högt och de kommer innan blocket markeras som invalid.",
+      "recommended_next_step": "Undersök detaljer i exceptions (de är trunkerade här) och eventuella samband med network-fel eller block-korruption."
+    },
+    {
+      "event_type": "Block markeras ogiltigt och raderas från alla hosts",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 40],
+      "observation": "Blocket läggs till i invalidSet och raderas från dataseten på samtliga inblandade noder.",
+      "interpretation": "Att blocket markeras invalid och raderas från alla platser efter ovan exception-upprepning är stark indikation på ett felaktigt blockförlopp, särskilt eftersom det skett kort efter warning/exception-perioden.",
+      "recommended_next_step": "Undersök orsaken till invalid-markering. Vanliga fel är block corruption, mismatch eller timeout under replikering. Kontrollera eventuellt metadata och DataNode-logger."
+    },
+    {
+      "event_type": "Försök att återinföra block som inte längre tillhör en fil",
+      "severity": "anomaly",
+      "supporting_log_lines": [38],
+      "observation": "NameNode får en addStoredBlock-request för blocket men loggar att blocket inte längre tillhör någon fil.",
+      "interpretation": "Detta är en vidare konsekvens av anomaly. Blocket borde inte försöka återföras efter invalid/radering; att det ändå sker indikerar inkonsekvent block- eller replikathantering.",
+      "recommended_next_step": "Analys av processer som triggar addStoredBlock för borttagna block; kan vara misslyckad repliksykling eller race condition. Kontrollera datasystemets synkronisering."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

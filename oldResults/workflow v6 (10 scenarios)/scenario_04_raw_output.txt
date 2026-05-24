@@ -1,0 +1,42 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Normal",
+  "confidence": "medium",
+  "classification_reason": "Trots många WARN/Exception-rader om misslyckade block-serving-försök, visar loggarna (rader 14–16) att blocket verifierades med godkänt resultat flera gånger innan några problem syns. Det finns ingen indikation på blockkorruption eller irreparabelt fel. Därefter markeras blocket som ogiltigt och tas bort – vilket kan vara ett tecken på normal garbadge collection/rensnings-logik i HDFS när blocket inte längre behövs eller används. Avsaknad av error- eller corruption-rader och tydlig verifieringssuccé innan ogiltighets-/raderingsprocess stödjer tolkningen att processen är normal och förväntad. Många serving-exceptions kan t ex inträffa om en klient stänger kopplingen, försöker läsa ett redan deletat block osv – detta behöver inte vara en anomali.",
+  "summary": "Blocket tas emot av flera noder, lagras och verifieras korrekt. Flera försök att servera blocket leder till undantag (exceptions), men inga allvarliga fel eller korruptionsindikationer förekommer. Blocket markeras slutligen som ogiltigt och raderas på samtliga noder, vilket tyder på att det avlägsnas enligt livscykel snarare än pga konkret fel.",
+  "events": [
+    {
+      "event_type": "Block mottaget och lagrat",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 10, 11, 12, 13],
+      "observation": "Blocket mottas på tre noder och lagras enligt blockMap.",
+      "interpretation": "Blockdistribution och lagring sker enligt förväntan för HDFS.",
+      "recommended_next_step": "Ingen åtgärd – processen är enligt förväntan."
+    },
+    {
+      "event_type": "Block verifierat",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Blocket verifieras tre gånger utan problem.",
+      "interpretation": "Datablocket är intakt och felfritt innan exception/warning-perioden börjar.",
+      "recommended_next_step": "Ingen åtgärd – blocket är verifierat som giltigt."
+    },
+    {
+      "event_type": "Exception vid serving av block",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32],
+      "observation": "Flera undantag (exceptions) inträffar vid försök att servera blocket till klienter/noder.",
+      "interpretation": "Serving-exceptions är relativt vanligt om klienter kopplar ned, försöker läsa icke-tillgängliga block eller stänger ned anslutningen. Varken error- eller korruptionsindikatorer syns.",
+      "recommended_next_step": "Om återkommande: Matcha exceptions mot klientloggar för att se varför anslutningen bröts eller varför läsning/överföring misslyckades. Kan ignoreras om liknande mönster är vanligt förekommande vid blocklivscykelns slut."
+    },
+    {
+      "event_type": "Block raderas/markeras ogiltig",
+      "severity": "normal",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 38],
+      "observation": "Blocket tas bort från alla noder och markeras som ogiltigt.",
+      "interpretation": "Normal blockradering i samband med avlägsnande/clean-up, inte i samband med fel eller blockkorruption.",
+      "recommended_next_step": "Inga åtgärder behövs om detta följer normal rensningscykel. Dubbelkolla att motsvarande filoperation (delete/close) utförts eller att blocket inte längre hör till någon fil."
+    }
+  ],
+  "unsupported_claims": []
+}

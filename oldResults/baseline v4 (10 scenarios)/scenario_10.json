@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Flera logghändelser visar på återkommande undantag (SocketTimeout, EOFException, IOException) vid blocköverföringen för samma block, inklusive problem med anslutning och mottagning. Blocket lyckas inte skrivas färdigt utan fel. Detta tyder på ett misslyckat överföringsförlopp trots frånvaron av ERROR-rader.",
+  "summary": "Loggarna visar att mottagning och skrivning av block misslyckas upprepade gånger för samma block-ID, med flera undantag av olika typer.",
+  "events": [
+    {
+      "event_type": "Block reception initiated",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3
+      ],
+      "observation": "Initiering av blockmottagning och blockallokering sker för block blk_-3102267849859399193.",
+      "interpretation": "Systemet börjar ta emot ett nytt block på vanligt vis.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna fas."
+    },
+    {
+      "event_type": "Block write timeout",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        4
+      ],
+      "observation": "writeBlock för samma block mottar ett SocketTimeoutException.",
+      "interpretation": "Tidsgränsen för skrivning av block överskrids, vilket ofta tyder på nätverks- eller lastproblem.",
+      "recommended_next_step": "Undersök nätverkstrafik samt system- och diskprestanda för DataNode."
+    },
+    {
+      "event_type": "PacketResponder terminated with exceptions",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        5,
+        6
+      ],
+      "observation": "PacketResponder terminerar för blocket, och EOFException kastas.",
+      "interpretation": "Blockrespons misslyckas, sannolikt på grund av att anslutningen abrupt avbrutits eller blivit otillgänglig.",
+      "recommended_next_step": "Se över anslutningslogg och eventuella krascher på klient/DataNode vid denna tidpunkt."
+    },
+    {
+      "event_type": "Block receive and write failed due to connection reset",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        7,
+        8
+      ],
+      "observation": "receiveBlock och writeBlock får IOException: Connection reset by peer.",
+      "interpretation": "Anslutningen bröts på distantsidan under blocköverföring, vilket gör processen ofullständig.",
+      "recommended_next_step": "Kontrollera stabilitet/kapacitet i nätverk och klientanslutningar. Se om peer-loggar visar motsvarande problem."
+    }
+  ],
+  "unsupported_claims": [
+    "Det är inte möjligt att fastslå exakt varför peer-anslutningen reset:ades eller varför timeouten inträffar, utan att ha mer data om nätverks- och hårdvarustatus."
+  ]
+}

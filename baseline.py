@@ -19,6 +19,7 @@ Viktigt:
 - supporting_log_lines ska innehålla radnummer från loggtexten, exempelvis [1, 3, 5].
 - Varje event ska ha severity: "normal", "warning", "error" eller "anomaly".
 - Hitta inte på information som inte stöds av loggraderna.
+- Om en möjlig tolkning är osäker och inte har tydligt stöd i loggraderna, placera den i unsupported_claims istället för att placera den som säker slutsats.
 - Om du är osäker, ange confidence som "low" eller "medium".
 
 JSON-format:

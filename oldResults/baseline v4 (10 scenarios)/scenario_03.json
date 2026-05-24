@@ -1,0 +1,68 @@
+{
+  "scenario_id": "scenario_03",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Alla loggrader är INFO och visar ett förlopp där blocket mottas, replikeras, verifieras och därefter tas bort. Det finns inga tecken på fel, varningar eller inkonsekvenser i blockhanteringen. Att block läggs till invalidSet och tas bort via delete är normalt vid t.ex. filradering eller när ett block inte längre behövs.",
+  "summary": "Blocket mottogs och replikerades till flera noder, verifierades framgångsrikt upprepade gånger, och togs därefter bort från systemet enligt normalt förlopp.",
+  "events": [
+    {
+      "event_type": "Block reception and replication",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "observation": "Blocket mottogs från tre olika noder och bekräftades med korrekt storlek.",
+      "interpretation": "Normal mottagning och replikering enligt HDFS förlopp.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block added to blockMap",
+      "severity": "normal",
+      "supporting_log_lines": [
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket registrerades på tre noder i blockMap.",
+      "interpretation": "Blocket är korrekt upptaget i HDFS metadata.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket verifierades upprepade gånger utan problem.",
+      "interpretation": "Blockets integritet bekräftad.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block invalidation and deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket lades till invalidSet på tre noder och togs därefter bort från samtliga.",
+      "interpretation": "Detta är normalt beteende, t.ex. när en fil raderas eller blocket inte längre behövs.",
+      "recommended_next_step": "Ingen åtgärd krävs så länge motsvarande fil/förfrågan om radering är förväntad."
+    }
+  ],
+  "unsupported_claims": []
+}

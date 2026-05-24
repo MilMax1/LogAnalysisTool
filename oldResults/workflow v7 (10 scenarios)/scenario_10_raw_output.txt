@@ -1,0 +1,42 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Loggscenariot visar ett blockförlopp där mottagning och skrivande av blocket misslyckas med flera exception-händelser (SocketTimeoutException, EOFException, Connection reset by peer) utan tecken på normal completion eller recovery. Flera involverade komponenter rapporterar exceptioner, vilket sammantaget tyder på ett avvikande och misslyckat förlopp snarare än en enstaka hanterad störning. Inga error- eller warn-rader finns, men mönstret är samstämmigt avbrutet över flera loggrader.",
+  "summary": "Block blk_-3102267849859399193 initieras för mottagning men dess skrivprocess misslyckas upprepade gånger med olika undantag hos DataXceiver, PacketResponder och BlockReceiver. Detta mönster pekar på ett signifikant och ej återhämtat fel vid blocköverföringen.",
+  "events": [
+    {
+      "event_type": "Receiving block initiated",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2],
+      "observation": "Blocket mottas från två olika källor till samma DataNode.",
+      "interpretation": "Initiering av blockmottagning sker normalt.",
+      "recommended_next_step": "Ingen åtgärd nödvändig för just detta steg."
+    },
+    {
+      "event_type": "writeBlock exception - timeout",
+      "severity": "anomaly",
+      "supporting_log_lines": [4],
+      "observation": "Skrivprocessen för blocket misslyckar med SocketTimeoutException.",
+      "interpretation": "Timeout vid försök att skriva blocket till DataNode. Detta är inte normalt i ett lyckat överföringsflöde.",
+      "recommended_next_step": "Undersök nätverksanslutning och möjliga resursbrister på DataNode vid den aktuella tiden."
+    },
+    {
+      "event_type": "PacketResponder exception and termination",
+      "severity": "anomaly",
+      "supporting_log_lines": [5, 6],
+      "observation": "PacketResponder avslutas och rapporterar EOFException.",
+      "interpretation": "Plötsligt avbrott i blockens dataöverföringsrespons, tyder på oväntat avbruten förbindelse eller överföring.",
+      "recommended_next_step": "Inspektera system- och nätverksloggar för möjliga orsaker till överföringsavbrott eller EOFException."
+    },
+    {
+      "event_type": "Exception in receiveBlock - Connection reset",
+      "severity": "anomaly",
+      "supporting_log_lines": [7, 8],
+      "observation": "Ytterligare exceptioner indikerar att mottagningen av blocket avbryts pga 'Connection reset by peer'.",
+      "interpretation": "Peer reset indikerar att motparten (ex. annan DataNode eller klient) abrupt avslutat anslutningen. Detta är starkt symptom på fel i dataöverföringsflödet.",
+      "recommended_next_step": "Verifera motparts (peer) nätverksstatus och anslutningsloggar. Kontrollera eventuella systemresursproblem eller konfigurationsproblem som kan leda till att förbindelser oväntat bryts."
+    }
+  ],
+  "unsupported_claims": []
+}

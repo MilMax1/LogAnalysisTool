@@ -1,0 +1,45 @@
+```json
+{
+  "scenario_id": "scenario_06",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggscenariot visar ett komplett och konsekvent blockflöde; blocket tas emot, replikeras till flera noder, används/servas till klienter, och senare tas bort utan kritiska fel eller avbrott i sekvensen. Det finns en enstaka rad med WARN i slutet om 'BlockInfo not found in volumeMap' vid borttagning, vilket är en mindre avvikelse och indikerar ingen systempåverkan eller blockförlust.",
+  "summary": "Blocket mottas och skrivs framgångsrikt till flera datanoder. Blocket delas ut till många klienter, och uppdateras i blockkartan. Blocket raderas från alla noder som förväntat. Endast en mindre varning noteras vid blockborttagning, utan systempåverkan.",
+  "events": [
+    {
+      "event_type": "Block allocation and writing",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "observation": "Block blk_-3544583377289625738 tas emot från tre källor; blockskrivningarna slutförs framgångsrikt.",
+      "interpretation": "Blockskrivningsförloppet är komplett och saknar felmeddelanden eller avvikelser.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block replication and usage",
+      "severity": "normal",
+      "supporting_log_lines": [12, 13, 14, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216],
+      "observation": "Blocket replikeras till flera datanoder (blockMap updated på flera noder). Blocket skickas ut till många klienter från flera källor.",
+      "interpretation": "All blockreplikering och läsning fungerar normalt och effektivt – ingen indikation på avbrott, inkonsekvens eller andra fel.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Block deletion process",
+      "severity": "normal",
+      "supporting_log_lines": [217, 218, 219, 220, 221, 222],
+      "observation": "Blocket tas bort från alla berörda datanoder och markerats som 'invalidSet' innan radering.",
+      "interpretation": "Blockradering sker som förväntat efter användning/utgång, ingen anomali i borttagningsflödet.",
+      "recommended_next_step": "Ingen åtgärd krävs."
+    },
+    {
+      "event_type": "Minor warning on block deletion",
+      "severity": "warning",
+      "supporting_log_lines": [223],
+      "observation": "WARN-rad: 'Unexpected error trying to delete block... BlockInfo not found in volumeMap.'",
+      "interpretation": "Indikerar att blockinformationen redan tagits bort eller att blocket redan var frånvarande vid volymkartläggningen. Ingen påverkan på block- eller systemintegritet indikeras i samband med denna varning.",
+      "recommended_next_step": "Om varningen upprepas frekvent kan volymkonsistens kontrolleras; annars kan den ignoreras."
+    }
+  ],
+  "unsupported_claims": [
+  ]
+}
+```

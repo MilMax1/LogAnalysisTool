@@ -3,7 +3,7 @@ from typing import Any
 
 from log_parser import parse_log_text
 
-#nuvarande regler och mönster är testvärden ochinte låsta, används för att hitta enkla mönster för att stödja analysen
+
 RULES = {
     "warn_level": ["WARN"],
     "error_level": ["ERROR"],

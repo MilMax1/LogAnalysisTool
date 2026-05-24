@@ -1,0 +1,56 @@
+{
+  "scenario_id": "scenario_03",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Hela händelsekedjan visar ett typiskt, felfritt blockflöde där blocket tas emot av DataNodes, lagras, valideras utan fel och sedemera raderas. Alla steg inklusive mottagande, lagring, och lyckad verifiering inträffar utan några varningar, fel eller undantag. De efterföljande invalid- och delete-händelserna motsvarar normal blocklivscykel i HDFS och föregås av förväntade verifieringar. Inga tecken på inkonsistens, block corruption, transfer-fel eller oväntad frånvaro av block observeras.",
+  "summary": "Blocket blk_-9073992586687739851 hanteras på förväntat sätt i HDFS: det tilldelas och tas emot av flera DataNodes, lagras och verifieras utan några varnings- eller felmeddelanden. Efter en tidsperiod tas blocket bort och förflyttas till invalidSet innan det raderas från lagringen, vilket är ett normalt mönster när filer eller block inte längre behövs. Loggflödet innehåller inga avvikelser, fel eller indirekta tecken på problem.",
+  "events": [
+    {
+      "event_type": "block_allocation_and_reception",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Blocket tilldelas och mottas av flera DataNodes från olika källor och lagras sedan i NameNode blockMap.",
+      "interpretation": "Beskriver en helt normal första del av blockets livscykel där blocket replikeras och lagras enligt HDFS principer.",
+      "recommended_next_step": "Ingen åtgärd krävs – mönstret är förväntat för blockallokering och mottagande."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket verifieras tre gånger, varje gång med lyckat resultat, utan felmeddelande.",
+      "interpretation": "Bekräftar att blockets data är korrekta och lagrade utan korruption eller integritetsproblem innan vidare hantering.",
+      "recommended_next_step": "Ingen åtgärd krävs – blockets integritet är bekräftad."
+    },
+    {
+      "event_type": "block_invalidation_and_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "observation": "Blocket markeras som ogiltigt (invalidSet) på flera DataNodes och raderas därefter fysiskt från filsystemet.",
+      "interpretation": "Denna sekvens inträffar när blocket inte längre refereras av någon fil, t.ex. efter filradering. Detta är standardbeteende och stöds av föregående lyckade blockverifieringar.",
+      "recommended_next_step": "Ingen åtgärd krävs – raderingsflödet är normalt vid exempelvis filradering."
+    }
+  ],
+  "unsupported_claims": []
+}

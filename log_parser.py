@@ -1,8 +1,14 @@
 import re
 from pathlib import Path
+from typing import Any
+
 
 BLOCK_ID_PATTERN = re.compile(r"\bblk_-?\d+\b")
 IP_PATTERN = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b")
+
+NUMBERED_LINE_PATTERN = re.compile(
+    r"^\[(?P<numbered_line>\d+)\]\s+(?P<log_content>.*)$"
+)
 
 LOG_LINE_PATTERN = re.compile(
     r"^(?P<date>\d{6})\s+"
@@ -13,33 +19,55 @@ LOG_LINE_PATTERN = re.compile(
     r"(?P<message>.*)$"
 )
 
-def extract_block_id(message: str) -> str | None:
-    match = BLOCK_ID_PATTERN.search(message)
+
+def extract_block_id(text: str) -> str | None:
+    match = BLOCK_ID_PATTERN.search(text)
 
     if not match:
         return None
-    
+
     return match.group(0)
 
 
-def extract_ips(message: str) -> list[str]:
-    return IP_PATTERN.findall(message)
+def extract_ips(text: str) -> list[str]:
+    return IP_PATTERN.findall(text)
 
-def parse_log_line(line: str, line_number: int) -> dict:
-    match = LOG_LINE_PATTERN.match(line)
+
+def strip_number_prefix(line: str) -> tuple[str, int | None]:
+    match = NUMBERED_LINE_PATTERN.match(line)
+
+    if not match:
+        return line, None
+
+    numbered_line = int(match.group("numbered_line"))
+    log_content = match.group("log_content")
+
+    return log_content, numbered_line
+
+
+def parse_log_line(line: str, file_line_number: int) -> dict[str, Any]:
+    original_line = line
+    log_content, numbered_line = strip_number_prefix(line)
+
+    line_number = numbered_line if numbered_line is not None else file_line_number
+
+    match = LOG_LINE_PATTERN.match(log_content)
 
     if not match:
         return {
             "line_number": line_number,
+            "file_line_number": file_line_number,
+            "numbered_line": numbered_line,
             "date": None,
             "time": None,
             "thread": None,
             "level": None,
             "component": None,
-            "message": line,
-            "block_id": extract_block_id(line),
-            "ips": extract_ips(line),
-            "raw": line,
+            "message": log_content,
+            "block_id": extract_block_id(log_content),
+            "ips": extract_ips(log_content),
+            "raw": original_line,
+            "raw_without_prefix": log_content,
             "parsed": False,
         }
 
@@ -48,6 +76,8 @@ def parse_log_line(line: str, line_number: int) -> dict:
 
     return {
         "line_number": line_number,
+        "file_line_number": file_line_number,
+        "numbered_line": numbered_line,
         "date": data["date"],
         "time": data["time"],
         "thread": data["thread"],
@@ -56,22 +86,25 @@ def parse_log_line(line: str, line_number: int) -> dict:
         "message": message,
         "block_id": extract_block_id(message),
         "ips": extract_ips(message),
-        "raw": line,
+        "raw": original_line,
+        "raw_without_prefix": log_content,
         "parsed": True,
     }
 
-def parse_log_text(log_text: str) -> list[dict]:
+
+def parse_log_text(log_text: str) -> list[dict[str, Any]]:
     parsed_logs = []
 
-    for line_number, line in enumerate(log_text.splitlines(), start=1):
+    for file_line_number, line in enumerate(log_text.splitlines(), start=1):
         if not line.strip():
             continue
 
-        parsed_logs.append(parse_log_line(line, line_number))
+        parsed_logs.append(parse_log_line(line, file_line_number))
 
     return parsed_logs
 
-def parse_log_file(path: str) -> list[dict]:
+
+def parse_log_file(path: str) -> list[dict[str, Any]]:
     file_path = Path(path)
 
     if not file_path.exists():

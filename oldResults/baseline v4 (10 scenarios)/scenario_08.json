@@ -1,0 +1,94 @@
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Flera DataNode-server varnar upprepade gånger för undantag ('Got exception while serving...') vid försök att servera blocket till ett stort antal olika klienter, vilket tyder på ett genomgående åtkomstproblem. Efter normal blockverifiering och lagring flaggas blocket som ogiltigt och raderas från samtliga noder, och ett försök sker senare att åter lägga till blocket som då inte hör till någon fil. Dessa symptom tillsammans indikerar ett felaktigt förlopp som avviker från normal blockhantering.",
+  "summary": "Blocket lagras och verifieras först som förväntat på flera DataNode-server, men ett stort antal varningar om undantag vid blockservering följs av markering som ogiltigt, radering och ett onormalt återläggningsförsök. Ingen normal blocklivscykel sker.",
+  "events": [
+    {
+      "event_type": "Block mottagen och lagrad på flera noder",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13
+      ],
+      "observation": "Blocket mottas, lagras och blockMap uppdateras korrekt på flera noder.",
+      "interpretation": "Det initiala skrivförloppet och replikeringen fungerar som väntat.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "Lyckad blockverifiering",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Verifikation lyckas för blocket vid flera tillfällen.",
+      "interpretation": "Blocket är intakt på de replikerade DataNode-serverna.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "Upprepade undantag vid blockservering",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "WARN-rader där DataNode misslyckas servera blocket till flera olika klienter.",
+      "interpretation": "Det är högst avvikande att blockservering konsekvent misslyckas för så många klienter från flera DataNode, trots att blockverifiering tidigare lyckades. Detta pekar mot ett korrupt block, metadatafel eller datanätverksproblem.",
+      "recommended_next_step": "Undersök detaljerad orsak till undantagen i DataNode-loggar (t.ex. IOExceptions, korrupt fil eller nätverksavbrott); kontrollera blockets tillgänglighet och metadata i NameNode."
+    },
+    {
+      "event_type": "Block markerad som ogiltig och raderad",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        40
+      ],
+      "observation": "Blocket läggs till invalidSet och raderas från alla DataNode.",
+      "interpretation": "NameNode identifierar blocket som inkonsekvent eller felaktigt och initierar radering — indikerar trolig datasäkerhets- eller konsistensproblematik.",
+      "recommended_next_step": "Kontrollera NameNode-loggar för felorsak, undersök om andra block eller filer påverkas, och analysera om NameNode- eller DataNode-diskar har problem."
+    },
+    {
+      "event_type": "Misslyckat/inkonsekvent återläggningsförsök av block",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        38,
+        39
+      ],
+      "observation": "Ett försök till addStoredBlock kommer efter radering, men blocket tillhör inte längre någon fil.",
+      "interpretation": "Blockreferenser är inkonsistenta, sannolikt kvarstående metadatafel.",
+      "recommended_next_step": "Granska blockmetadata, filsystemets konsistens och om det finns fler liknande block; kör fsck på HDFS."
+    }
+  ],
+  "unsupported_claims": [
+    "Det går inte att avgöra exakt vilken typ av exception som inträffade på DataNode-vid blockservering då loggtexten inte specificerar exceptiontypen.",
+    "Det är oklart om orsaken är diskfel, korrupt HDFS-metadata eller nätverksproblem mellan DataNode och klient."
+  ]
+}

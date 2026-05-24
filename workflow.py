@@ -20,18 +20,18 @@ def run_workflow(log_text: str, scenario_id: str, block_id: str) -> str:
     prompt = f"""
 Du analyserar ett loggscenario från HDFS, ett distribuerat filsystem.
 
-Du får både rå loggdata och en strukturerad kontext som skapats av arbetsflödet.
-Använd den strukturerade kontexten som stöd, men basera slutsatser på loggraderna.
+Du får både rå loggdata och ett strukturerat analysunderlag som skapats av arbetsflödet.
+Använd det strukturerade analysunderlaget som stöd för att förstå loggmönster, men basera slutliga slutsatser på loggraderna och ange stödjande radnummer.
 
-Viktigt om strukturerad kontext:
-- Den strukturerade kontexten visar endast potentiellt relevanta loggrader, mönster och event-template counts.
+Viktigt om det strukturerade analysunderlaget:
+- Det strukturerade analysunderlaget visar endast potentiellt relevanta loggrader, mönster och event-template counts.
 - Matchade regler, kandidathändelser eller event counts betyder inte automatiskt att scenariot är en anomali.
 - Event-template counts är härledda från loggarna men är inte ground truth.
 - Liknande event templates och counts kan förekomma i både normala och avvikande HDFS-traces. Använd därför event counts som stöd för struktur, inte som ensam grund för klassificering.
 - Vissa event templates kan vara diagnostiskt viktiga även om de förekommer få gånger, exempelvis templates som beskriver oväntade delete-fel, block som inte längre tillhör någon fil, failed transfer eller timeout.
 - Vanligt förekommande templates, exempelvis repeated serving exceptions, kan förekomma i både normala och avvikande traces och ska därför inte ensamma avgöra klassificeringen.
 
-Strukturerad kontext:
+Strukturerat analysunderlag:
 {combined_context}
 
 Uppgift:
@@ -48,6 +48,7 @@ Viktigt:
 - supporting_log_lines ska innehålla radnummer från loggtexten, exempelvis [1, 3, 5].
 - Varje event ska ha severity: "normal", "warning", "error" eller "anomaly".
 - Hitta inte på information som inte stöds av loggraderna.
+- Om en möjlig tolkning är osäker och inte har tydligt stöd i loggraderna, placera den i unsupported_claims istället för att placera den som säker slutsats.
 - Om du är osäker, ange confidence som "low" eller "medium".
 
 JSON-format:

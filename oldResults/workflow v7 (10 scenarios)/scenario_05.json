@@ -1,0 +1,82 @@
+{
+  "scenario_id": "scenario_05",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggen visar ett fullständigt blockförlopp där blocket mottas korrekt, verifieras utan fel, därefter returnerar upprepade varningsnivå-exceptions vid servering till klienter (vilket är vanligt förekommande och inte i sig en anomali), innan blocket deklareras som ogiltigt och raderas. Det finns inga error-nivå-loggrader, tecken på blockkorruption eller failed-transfer, och blockets livscykel motsvarar normal hantering av ogiltiga/ej längre refererade block i HDFS.",
+  "summary": "Blocket blk_1717858812220360316 tas emot på flera datanoder, adderas till blockMap och verifieras framgångsrikt. Upprepade WARN/exception-rader uppstår vid försök att servera blocket till olika klienter, men ingen explicit korruption eller dataförlust noterad. Blocket läggs senare till DataNodes invalidSet och raderas, vilket överensstämmer med normal blocklivscykel när blocket inte längre behövs eller är ogiltigt. Inga tydliga anomalier i blockoperationer identifieras.",
+  "events": [
+    {
+      "event_type": "Block mottagen på alla repliker",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        10,
+        11,
+        12,
+        13
+      ],
+      "observation": "Block blk_1717858812220360316 tas emot och lagras på alla avsedda DataNodes.",
+      "interpretation": "Block replication och lagring fungerar som förväntat.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "Block verifierad utan fel",
+      "severity": "normal",
+      "supporting_log_lines": [
+        14,
+        15,
+        16
+      ],
+      "observation": "Alla blockkopior verifieras framgångsrikt.",
+      "interpretation": "Ingen blockkorruption är närvarande.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    },
+    {
+      "event_type": "Upprepade undantag (Exception) vid blockservering",
+      "severity": "warning",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observation": "WARN-rader: Got exception while serving block till ett flertal olika klientadresser.",
+      "interpretation": "Upprepade läsförsök från klienter misslyckas, men det leder inte till ERROR eller block corruption. Vanligt enligt HDFS-mönster och inte en anomali om blocket blir ogiltigt samtidigt.",
+      "recommended_next_step": "Utred klientloggar eller nätverk om användare rapporterar läsproblem, men betraktas normalt utifrån systemdrift."
+    },
+    {
+      "event_type": "Block deklareras ogiltig och raderas",
+      "severity": "normal",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket läggs till invalidSet på alla datanoder och raderas från disk.",
+      "interpretation": "Överensstämmer med normal blockhantering när block är ogiltigt/referenslöst.",
+      "recommended_next_step": "Ingen åtgärd krävs för denna del."
+    }
+  ],
+  "unsupported_claims": [
+    "Ingen loggrad visar explicit block- eller metadata-korruption.",
+    "Ingen loggrad visar explicit nätverksproblem eller återkommande hårdvarufel."
+  ]
+}

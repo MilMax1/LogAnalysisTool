@@ -1,0 +1,77 @@
+{
+  "scenario_id": "scenario_04",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Flera WARN-loggar under en kort tidsperiod indikerar upprepade fel vid försök att leverera blocket till diverse noder, följt av att blocket läggs till invalidSet och raderas på alla tre noder. Brist på ERROR-rader och förekomsten av lyckad blockverifiering ger viss osäkerhet, men sammantaget visar förloppet ett avvikande och misslyckat blockflöde.",
+  "summary": "Blocket blk_7854771516489510256 skrivs initialt framgångsrikt till tre datanoder och verifieras därefter korrekt. En rad misslyckade försök att servera blocket inträffar dock, vilket åtföljs av att blocket markeras som ogiltigt/raderas på samtliga noder. Detta signalerar ett avvikande flöde trots avsaknad av ERROR-loggar.",
+  "events": [
+    {
+      "event_type": "block_written_and_verified",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "observation": "Blocket togs emot, lagrades på tre olika datanoder, och verifierades tre gånger utan fel.",
+      "interpretation": "Inga tecken på omedelbara problem vid skrivning eller initial blockhantering.",
+      "recommended_next_step": "Ingen åtgärd gällande blockskrivning/initial validering."
+    },
+    {
+      "event_type": "repeated_exceptions_serving_block",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        30,
+        31,
+        32
+      ],
+      "observation": "Flera på varandra följande WARN-rader om exception vid försök att servera blocket till olika klienter från olika datanoder.",
+      "interpretation": "Blocket lyckas inte levereras till klienter från någon av sina repliker, trots att det är verifierat. Detta tyder på ett systematiskt problem med blockåtkomst.",
+      "recommended_next_step": "Undersök varför blocket ger exception vid läsning (t.ex. nätverksproblem, blockkorruption, metadata-inkonsistens)."
+    },
+    {
+      "event_type": "block_marked_invalid_and_deleted",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "observation": "Blocket markeras som ogiltigt och raderas från samtliga tre datanoder någon tid efter exceptions.",
+      "interpretation": "Blocket anses slutligen vara felaktigt eller otillgängligt och tas därför bort.",
+      "recommended_next_step": "Kontrollera orsak till att blocket ansågs ogiltigt (loggutdrag från associerad namenode och klientapplikation kan hjälpa), säkerställ att dataåterställning kan ske från andra repliker eller genom omproduktion."
+    }
+  ],
+  "unsupported_claims": [
+    "Det går inte att avgöra exakt vilken typ av exception eller orsak till blockinvaliditet endast från tillgängliga loggrader.",
+    "Det går inte att med säkerhet avgöra om blocket var korrupt, om det förekom diskfel, eller om det var fel på klientapplikationen."
+  ]
+}

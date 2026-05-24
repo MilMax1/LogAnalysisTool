@@ -1,0 +1,54 @@
+```json
+{
+  "scenario_id": "scenario_07",
+  "classification": "Anomaly",
+  "confidence": "medium",
+  "classification_reason": "Efter en initialt helt normal blocköverföring och verifiering får samtliga tre replikerade block upprepade varningsmeddelanden om exception vid block-serving till klienter. Därpå följer borttagning av blocket från samtliga datanoder. Slutligen sker en block-addStoredBlock, men blocket tillhör inte längre någon fil. Detta sammantaget avviker från ett normalt, framgångsrikt blockförlopp i HDFS.",
+  "summary": "Blocket blk_-8531310335568756456 tar emot och verifieras normalt på tre repliker. Efter lång tids tystnad försöker flera klienter läsa blocket och får samtliga exception (WARN). Därefter tas blocket bort från alla tre noder. Ett senare försök att addera blocket igen rapporterar att det inte längre hör till någon fil, vilket stärker bilden av ett icke-normalt blockförlopp.",
+  "events": [
+    {
+      "event_type": "Block reception and successful replication",
+      "severity": "normal",
+      "supporting_log_lines": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+      "observation": "Blocket tas emot av flera datanoder och blockMap uppdateras korrekt på tre noder.",
+      "interpretation": "Blocket skrivs och replikerades korrekt enligt HDFS-standard.",
+      "recommended_next_step": "Ingen åtgärd behövs för denna händelse."
+    },
+    {
+      "event_type": "Block verification after writing",
+      "severity": "normal",
+      "supporting_log_lines": [14, 15, 16],
+      "observation": "Verifiering av blocket lyckas på flera noder vid olika tillfällen.",
+      "interpretation": "Replikerad dataintegritet verifierad omedelbart efter mottagning.",
+      "recommended_next_step": "Ingen åtgärd behövs för denna händelse."
+    },
+    {
+      "event_type": "Exceptions during block serving",
+      "severity": "anomaly",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+      "observation": "Flera varningsrader (WARN) om exception vid försök att serva blocket till olika klienter på samtliga noder.",
+      "interpretation": "Upprepat misslyckade läsförsök tyder på onåbarhet eller korrupt block på alla repliker.",
+      "recommended_next_step": "Analysera DataNode- och klientloggar för att fastställa orsak till exception. Kontrollera nätverk, blockmetadata och datakonsistens."
+    },
+    {
+      "event_type": "Delete and invalidSet events for the block",
+      "severity": "anomaly",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 40],
+      "observation": "Blocket läggs till invalidSet och tas bort från samtliga tre noder.",
+      "interpretation": "Blocket anses ogiltigt i HDFS och tas bort – konsekvens av allvarligt fel.",
+      "recommended_next_step": "Undersök varför blocket ansågs ogiltigt; verifiera NameNode-loggar samt orsak till korruption eller andra fel i blockhanteringen."
+    },
+    {
+      "event_type": "Attempt to add orphaned block",
+      "severity": "anomaly",
+      "supporting_log_lines": [38, 39],
+      "observation": "Försök att addera blocket till blockMap på en DataNode, men blocket tillhör inte längre någon fil.",
+      "interpretation": "Blocket är föräldralöst och hör inte hemma i någon fil enligt HDFS-metadata.",
+      "recommended_next_step": "Verifiera om block-metadata eller filsystemet är inkonsekvent. Konsultera NameNode och överväg replikering av berörda filer."
+    }
+  ],
+  "unsupported_claims": [
+    "Att blocket är korrupt eller att ett specifikt hårdvarufel uppstått kan ej fastställas direkt utifrån dessa loggrader, men är möjliga orsaker."
+  ]
+}
+```

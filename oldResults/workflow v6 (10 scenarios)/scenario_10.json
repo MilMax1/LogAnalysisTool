@@ -1,0 +1,52 @@
+{
+  "scenario_id": "scenario_10",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Scenariot innehåller flera exception-rader för samma block, inklusive SocketTimeoutException, EOFException och IOException 'Connection reset by peer', utan några indikationer på en lyckad blockskrivning eller efterföljande normal aktivitet för blocket. Dessa fel indikerar att blocköverföringen har brutits på ett icke-normalt sätt, och ingen loggrad visar att överföringen återhämtas eller slutförs korrekt. Anledningen stöds av flera loggrader (4, 6, 7, 8) som tillsammans visar på ett misslyckat blockförlopp.",
+  "summary": "Blocket blk_-3102267849859399193 mottas, men flera exception-rader visar att blocköverföringen misslyckas på grund av timeout och anslutningsproblem. Inga indikationer ges på att blocket hanteras klart eller på ett normalt återhämtningsflöde.",
+  "events": [
+    {
+      "event_type": "Receiving block",
+      "severity": "normal",
+      "supporting_log_lines": [
+        1,
+        2
+      ],
+      "observation": "Blocket blk_-3102267849859399193 tas emot från två källor.",
+      "interpretation": "Blocköverföringen påbörjas som vanligt.",
+      "recommended_next_step": "Verifiera om sändande noder hade några problem vid blocköverföringen."
+    },
+    {
+      "event_type": "writeBlock SocketTimeoutException",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        4
+      ],
+      "observation": "writeBlock för blocket resulterar i SocketTimeoutException.",
+      "interpretation": "Timeout under skriving av blocket tyder på nätverks- eller prestandaproblem mellan noder.",
+      "recommended_next_step": "Undersök nätverkslatens och barriärer mellan datanoder för blockskrivningar vid aktuell tidpunkt."
+    },
+    {
+      "event_type": "PacketResponder EOFException",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        6
+      ],
+      "observation": "PacketResponder rapporterar EOFException för samma block.",
+      "interpretation": "Blocköversändningen avbryts abrupt, ofta p.g.a. brutet nätverksflöde.",
+      "recommended_next_step": "Analysera om klienten eller annan nod plötsligt avbröt sessionen på grund av nätverksproblem eller krascher."
+    },
+    {
+      "event_type": "receiveBlock IOException: Connection reset by peer",
+      "severity": "anomaly",
+      "supporting_log_lines": [
+        7,
+        8
+      ],
+      "observation": "Både BlockReceiver och DataXceiver rapporterar 'Connection reset by peer'-fel för blocket.",
+      "interpretation": "Förbindelsen mellan noder har oväntat stängts, vilket förhindrar fullbordad blocköverföring.",
+      "recommended_next_step": "Kontrollera stabiliteten och loggar på den peer som var involverad i överföringen för att identifiera varför anslutningen bröts."
+    }
+  ],
+  "unsupported_claims": []
+}

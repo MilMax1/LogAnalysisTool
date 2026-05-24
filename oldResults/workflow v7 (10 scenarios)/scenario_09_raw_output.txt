@@ -1,0 +1,50 @@
+{
+  "scenario_id": "scenario_09",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Trots att blocket först mottas, lagras, verifieras och hanteras på normalt sätt, förekommer flera varningsloggar (WARN) om exceptioner vid försök att servera blocket (rader 17, 19-32). Dessa exceptioner är många och återkommande. Efter dessa exceptioner markeras blocket som invalid och tas bort från flera noder (rader 33-35, 36-39). Kritisk är dessutom rad 38 där ett oväntat fel ('Unexpected error trying to delete block... BlockInfo not found in volumeMap') uppstår vid försök till borttagning. Denna typ av fel är ovanlig och kan tyda på inkonsekvent metadata eller misslyckad blockhantering. Sammantaget visar loggraderna en avvikande, misslyckad och inkonsekvent blocklivscykel. Därför klassificeras scenariot som Anomaly.",
+  "summary": "Blocket mottas, lagras och verifieras normalt, men därefter följer ett flertal exception-varningar vid försök att servera blocket. Till slut markerar systemet blocket som invalid och försöker ta bort det från flera noder. Ett oväntat fel inträffar dessutom vid borttagning när blockinformationen saknas i volumeMap, vilket tyder på möjlig data- eller metadatainkonsistens. Detta avviker från ett friskt blockflöde och antyder en anomali.",
+  "events": [
+    {
+      "event_type": "Block mottas, lagras och verifieras",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 3, 4, 5, 7, 8, 9, 11, 13, 14, 15, 16],
+      "observation": "Blocket tas emot från flera källor och lagras fysiskt på flera datanoder. Verifiering lyckas upprepade gånger.",
+      "interpretation": "Blockmottagning och första verifieringssteg sker normalt utan fel.",
+      "recommended_next_step": "Inga åtgärder krävs för denna fas då inga avvikelser föreligger."
+    },
+    {
+      "event_type": "Upprepade exception-varningar vid block-servering",
+      "severity": "warning",
+      "supporting_log_lines": [17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+      "observation": "Upprepade WARN-loggrader om 'Got exception while serving ...'.",
+      "interpretation": "Datanoder får kontinuerliga problem när blocket ska serveras till klienter eller andra noder. Även om detta ibland kan vara temporärt, är mängden och varaktigheten av dessa varningar tecken på blockproblem.",
+      "recommended_next_step": "Granska detaljerad orsak till exceptionerna i datanodernas loggar (mer detaljer i samma loggrad eller relaterade debug/stacktracer). Analysera eventuella nätverks-, korruptions- eller accessproblem till blocket."
+    },
+    {
+      "event_type": "Block markeras som invalid och förbereds för radering",
+      "severity": "warning",
+      "supporting_log_lines": [33, 34, 35],
+      "observation": "Blocket läggs till invalidSet för samtliga aktuella noder.",
+      "interpretation": "Blocket betraktas nu som ej giltigt och förbereds för radering.",
+      "recommended_next_step": "Kontrollera varför blocket anses vara invalid – exempelvis pga. exceptionerna ovan."
+    },
+    {
+      "event_type": "Upprepade raderingsförsök av block",
+      "severity": "warning",
+      "supporting_log_lines": [36, 37, 39],
+      "observation": "Systemet försöker radera blocket från flera platser.",
+      "interpretation": "Standardflöde för att ta bort ogiltigt block från datanoder.",
+      "recommended_next_step": "Verifiera att alla block som ska tas bort raderas korrekt i filsystemet, utan oväntade fel."
+    },
+    {
+      "event_type": "Oväntat fel vid radering: BlockInfo saknas i volumeMap",
+      "severity": "anomaly",
+      "supporting_log_lines": [38],
+      "observation": "WARN-loggrad om 'Unexpected error trying to delete block ... BlockInfo not found in volumeMap.'",
+      "interpretation": "Metadata för blocket saknas när blocket ska raderas – detta är en stark indikation på inkonsistens mellan filsystemets metadata och verkligt blockinnehåll.",
+      "recommended_next_step": "Utför fsck (filesystem check) för att identifiera och reparera eventuella metadata- och blockinkonsistenser. Granska loggar och överväg att starta om berörda datanoder och kontrollera att noder är korrekt synkroniserade med NameNode."
+    }
+  ],
+  "unsupported_claims": []
+}

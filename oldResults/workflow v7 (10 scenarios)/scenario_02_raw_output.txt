@@ -1,0 +1,52 @@
+```json
+{
+  "scenario_id": "scenario_02",
+  "classification": "Normal",
+  "confidence": "high",
+  "classification_reason": "Loggsekvensen visar ett fullständigt och konsistent HDFS-blockflöde: blocket tas emot av flera datanoder, lagras, läggs till i blockMap, verifieras framgångsrikt, och tas slutligen bort genom planerad invalidation och radering. Inga tecken på fel, varningar eller oväntade undantag förekommer. De deletion/invalid-loggar som förekommer förklaras av blocklivscykeln och stöds av att blocket tidigare är mottaget och verifierat utan problem.",
+  "summary": "Blocket mottas och distribueras till flera noder, lyckas med block-verifikation, och tas senare bort via normal invalid/radering-process. Blocklivscykeln saknar fel, varningar eller misslyckade steg.",
+  "events": [
+    {
+      "event_type": "block_receive",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4],
+      "observation": "Blocket blk_7503483334202473044 tas emot av tre olika DataNode instanser.",
+      "interpretation": "Detta är det normala första steget i blockets livscykel i HDFS, där replikering till flera noder sker.",
+      "recommended_next_step": "Ingen åtgärd behövs. Bekräftar att blocket distribuerats korrekt."
+    },
+    {
+      "event_type": "block_store",
+      "severity": "normal",
+      "supporting_log_lines": [11, 12, 13],
+      "observation": "Blocket läggs till blockMap och markeras som lagrat på samtliga tre DataNodes.",
+      "interpretation": "Bekräftar att blocket är korrekt registrerat hos NameNode för replikering och tracking.",
+      "recommended_next_step": "Ingen åtgärd behövs, blocket är korrekt registrerat."
+    },
+    {
+      "event_type": "block_verification",
+      "severity": "normal",
+      "supporting_log_lines": [15, 16],
+      "observation": "Blocket verifieras framgångsrikt två gånger.",
+      "interpretation": "Datakonsistensen är säkerställd – ingen blockkorruption upptäcks.",
+      "recommended_next_step": "Ingen åtgärd krävs. Verifieringen har lyckats."
+    },
+    {
+      "event_type": "block_invalidation",
+      "severity": "normal",
+      "supporting_log_lines": [17, 18, 19],
+      "observation": "Blocket läggs till invalidSet för samtliga DataNodes.",
+      "interpretation": "Detta är normalt i slutet av blockets livscykel, t.ex. vid filradering eller omskrivning.",
+      "recommended_next_step": "Bekräfta om filen/blocket ska tas bort utifrån systemets övergripande logik, men inga feltyper syns här."
+    },
+    {
+      "event_type": "block_deletion",
+      "severity": "normal",
+      "supporting_log_lines": [20, 21, 22],
+      "observation": "Blocket raderas från samtliga DataNodes kort efter invalidation.",
+      "interpretation": "Normalt raderingsförfarande när filen eller blocket inte längre behövs.",
+      "recommended_next_step": "Ingen åtgärd krävs, raderingen är förväntad utifrån tidigare loggrader."
+    }
+  ],
+  "unsupported_claims": []
+}
+```

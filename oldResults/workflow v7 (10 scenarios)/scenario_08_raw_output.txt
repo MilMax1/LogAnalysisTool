@@ -1,0 +1,44 @@
+```json
+{
+  "scenario_id": "scenario_08",
+  "classification": "Anomaly",
+  "confidence": "high",
+  "classification_reason": "Loggen visar ett typiskt anomaliförlopp för HDFS-blockhantering där blocket först tas emot, verifieras och mappar korrekt till datanoder men där det senare uppkommer upprepade exception-rader vid försök att servera blocket. Blocket markeras sedan som invalid och raderas från samtliga noder. Slutligen försöker en nod återregistera blocket men systemet rapporterar att blocket 'inte längre tillhör någon fil', vilket är ett klassiskt tecken på inkonsekvens eller onormalt avslut för blocket. Denna sekvens (särskilt loggraden på rad 38) avviker tydligt från normala HDFS-livscykler.",
+  "summary": "Blocket blk_3947106522258141922 tas emot av flera datanoder och verifieras utan problem. Senare uppstår många 'Got exception while serving block' varningar på flera noder, vilket pekar på konsekventa serveringsproblem. Därefter markeras blocket som invalid och raderas från alla noder. Efter radering försöker en nod återregistera blocket, men systemet anger att blocket inte längre tillhör någon fil, vilket indikerar metadatainkonsistens och onormalt blockflöde.",
+  "events": [
+    {
+      "event_type": "Block reception and verification",
+      "severity": "normal",
+      "supporting_log_lines": [1, 2, 4, 6, 8, 9, 10, 12, 13, 14, 15, 16],
+      "observation": "Blocket mottas från olika källor, läggs till blockMap och klarar verifiering på samtliga noder.",
+      "interpretation": "Blocket skrivs initialt korrekt och dataintegriteten verkar uppnådd.",
+      "recommended_next_step": "Ingen åtgärd krävs för detta steg."
+    },
+    {
+      "event_type": "Repeated exceptions during block serving",
+      "severity": "warning",
+      "supporting_log_lines": [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+      "observation": "Upprepade 'Got exception while serving' för flera olika mottagarnoder och datanoder.",
+      "interpretation": "Det finns systematiska problem vid läsning eller överföring av blocket – antingen är blocket korrupt, saknas, låst eller annan felfunktion uppstår.",
+      "recommended_next_step": "Analysera exception-detaljer där de finns (i råloggar) och kontrollera diskstatus/loggfiler hos inblandade datanoder för att isolera orsaken."
+    },
+    {
+      "event_type": "Block marked as invalid and deleted from all nodes",
+      "severity": "warning",
+      "supporting_log_lines": [33, 34, 35, 36, 37, 40],
+      "observation": "Blocket läggs till 'invalidSet' på samtliga datanoder och raderas från disk.",
+      "interpretation": "Detta är en följd av tidigare misslyckanden och innebär att blocket tas ur drift på grund av att det bedöms ogiltigt eller inkonsistent.",
+      "recommended_next_step": "Kontrollera namnrymd och blockMap för att säkerställa att inga kvarvarande referenser till blocket finns; verifiera replikationspolicy och om återläsning eller återställning behövs."
+    },
+    {
+      "event_type": "AddStoredBlock request for deleted block – block does not belong to any file",
+      "severity": "anomaly",
+      "supporting_log_lines": [38],
+      "observation": "Efter att blocket raderats försöker systemet lägga till blocket i blockMap men får svaret 'it does not belong to any file'.",
+      "interpretation": "Detta är typiskt för metadatainkonsistens i HDFS; block-ID:t försöker återintroduceras trots att dess koppling till filsystemet är bruten.",
+      "recommended_next_step": "Kör HDFS fsck för hela filsystemet och analysera om ytterligare block är inkonsekventa; granska HDFS-metadata (NameNode) för ytterligare anomalier."
+    }
+  ],
+  "unsupported_claims": []
+}
+```
